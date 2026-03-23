@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solaryn Fit — Coach Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* ── TOKENS ── */
+  :root {
+    --bg:      #0A0A0F;
+    --surface: #111118;
+    --card:    #16161F;
+    --border:  #1E1E2A;
+    --gold:    #C9A84C;
+    --gold-dim:#8A6E2F;
+    --gold-glow:rgba(201,168,76,0.12);
+    --white:   #F0EFE8;
+    --muted:   #6B6A7A;
+    --dim:     #3A3950;
+    --green:   #2ECC71;
+    --blue:    #4A9EFF;
+    --red:     #E74C3C;
+    --orange:  #F39C12;
+    --purple:  #9B59B6;
+    --font: 'Georgia', serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: system-ui, sans-serif; display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 24px 0; flex-shrink: 0; }
+  .sidebar-brand { padding: 0 20px 24px; border-bottom: 1px solid var(--border); }
+  .sidebar-brand h1 { font-family: var(--font); color: var(--gold); font-size: 16px; letter-spacing: 3px; font-weight: 700; }
+  .sidebar-brand p { color: var(--muted); font-size: 11px; margin-top: 4px; }
+  .sidebar-nav { padding: 16px 0; flex: 1; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: var(--muted); font-size: 14px; cursor: pointer; transition: all 0.15s; border-left: 2px solid transparent; }
+  .nav-item:hover { color: var(--white); background: rgba(255,255,255,0.04); }
+  .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: var(--gold-glow); }
+  .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+  .coach-card { display: flex; align-items: center; gap: 10px; }
+  .coach-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--gold-glow); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .coach-name { font-size: 13px; font-weight: 600; }
+  .coach-role { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+  /* ── MAIN ── */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .topbar { padding: 16px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--surface); flex-shrink: 0; }
+  .topbar-title { font-size: 18px; font-weight: 600; }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px; }
+
+  /* ── STATS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .stat-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; }
+  .stat-value { font-size: 28px; font-weight: 700; color: var(--white); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .stat-delta { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-top: 4px; }
+  .delta-up   { background: rgba(46,204,113,0.15); color: var(--green); }
+  .delta-down { background: rgba(231,76,60,0.15);  color: var(--red); }
+
+  /* ── CLIENT TABLE ── */
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .section-title { font-size: 11px; font-weight: 700; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+  .client-table { width: 100%; border-collapse: collapse; }
+  .client-table th { text-align: left; padding: 8px 12px; font-size: 11px; color: var(--muted); letter-spacing: 1px; font-weight: 700; border-bottom: 1px solid var(--border); }
+  .client-table td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .client-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .client-row { cursor: pointer; }
+  .client-name { display: flex; align-items: center; gap: 10px; }
+  .client-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--dim); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+  .client-name-text { font-weight: 600; }
+  .client-email { font-size: 12px; color: var(--muted); margin-top: 1px; }
+  .tier-badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; }
+  .tier-free    { background: rgba(107,106,122,0.2); color: var(--muted); }
+  .tier-app     { background: rgba(74,158,255,0.2);  color: var(--blue); }
+  .tier-coached { background: rgba(201,168,76,0.2);  color: var(--gold); }
+  .tier-elite   { background: rgba(155,89,182,0.2);  color: var(--purple); }
+  .hrv-bar { display: flex; align-items: center; gap: 8px; }
+  .hrv-track { width: 80px; height: 5px; background: var(--dim); border-radius: 3px; overflow: hidden; }
+  .hrv-fill  { height: 100%; border-radius: 3px; background: var(--green); }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+  .status-active   { background: var(--green); }
+  .status-inactive { background: var(--muted); }
+  .action-btn { background: var(--surface); border: 1px solid var(--border); color: var(--white); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+  .action-btn:hover { background: var(--card); border-color: var(--gold); color: var(--gold); }
+  .action-btn.gold { background: var(--gold-glow); border-color: var(--gold); color: var(--gold); }
+
+  /* ── CLIENT DETAIL PANEL ── */
+  .client-detail { position: fixed; right: 0; top: 0; width: 380px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); padding: 24px; overflow-y: auto; transform: translateX(100%); transition: transform 0.25s ease; z-index: 100; }
+  .client-detail.open { transform: translateX(0); }
+  .detail-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .detail-close { background: none; border: none; color: var(--muted); font-size: 20px; cursor: pointer; padding: 4px; }
+  .detail-close:hover { color: var(--white); }
+  .detail-profile { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+  .detail-avatar { width: 52px; height: 52px; border-radius: 50%; background: var(--gold-glow); border: 1px solid var(--gold); display: flex; align-items: center; justify-content: center; color: var(--gold); font-size: 18px; font-weight: 700; }
+  .detail-name { font-size: 18px; font-weight: 700; }
+  .detail-info { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .detail-section { margin-bottom: 20px; }
+  .detail-section-title { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; }
+  .metric-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .metric-label { font-size: 13px; color: var(--muted); }
+  .metric-value { font-size: 14px; font-weight: 600; }
+  .msg-input-row { display: flex; gap: 8px; margin-top: 10px; }
+  .msg-input { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--white); padding: 10px 12px; border-radius: 8px; font-size: 14px; }
+  .msg-input::placeholder { color: var(--muted); }
+  .msg-send { background: var(--gold); border: none; color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .msg-bubble { padding: 10px 12px; border-radius: 10px; margin-bottom: 6px; font-size: 13px; line-height: 1.5; }
+  .msg-coach  { background: var(--gold-glow); border: 1px solid var(--gold-dim); color: var(--white); }
+  .msg-client { background: var(--card); border: 1px solid var(--border); color: var(--white); }
+  .msg-time   { font-size: 10px; color: var(--muted); margin-bottom: 3px; }
+
+  /* ── REVENUE SECTION ── */
+  .revenue-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 24px; }
+  .revenue-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .revenue-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .revenue-label { font-size: 13px; width: 60px; color: var(--muted); }
+  .revenue-track { flex: 1; height: 8px; background: var(--dim); border-radius: 4px; overflow: hidden; }
+  .revenue-fill { height: 100%; border-radius: 4px; }
+
+  /* ── BUTTONS ── */
+  .btn-primary { background: var(--gold); color: var(--bg); border: none; padding: 10px 18px; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { background: var(--card); color: var(--white); border: 1px solid var(--border); padding: 10px 18px; border-radius: 8px; font-size: 14px; cursor: pointer; }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── EMPTY ── */
+  .empty-state { text-align: center; padding: 60px 40px; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--dim); border-radius: 4px; }
+
+  /* ── AUTH ── */
+  .auth-screen { display: flex; align-items: center; justify-content: center; height: 100vh; width: 100%; }
+  .auth-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; width: 360px; }
+  .auth-title { font-family: var(--font); color: var(--gold); font-size: 22px; letter-spacing: 3px; text-align: center; margin-bottom: 8px; }
+  .auth-sub { color: var(--muted); font-size: 13px; text-align: center; margin-bottom: 24px; }
+  .auth-input { width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--white); padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 10px; }
+  .auth-input::placeholder { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <h1 class="auth-title">SOLARYN FIT</h1>
+    <p class="auth-sub">Coach Dashboard · Sign in</p>
+    <input class="auth-input" type="email" id="auth-email" placeholder="Email" />
+    <input class="auth-input" type="password" id="auth-pass" placeholder="Password" />
+    <p id="auth-error" style="color:var(--red);font-size:13px;margin-bottom:8px;display:none"></p>
+    <button class="btn-primary" style="width:100%;margin-top:4px" onclick="doSignIn()">Sign in</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" style="display:none;width:100%;height:100vh;display:none;overflow:hidden;flex-direction:row">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-brand">
+      <h1>SOLARYN FIT</h1>
+      <p>Coach Dashboard</p>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-item active" onclick="showView('clients')"><span class="nav-icon">👥</span>Clients</div>
+      <div class="nav-item" onclick="showView('revenue')"><span class="nav-icon">💰</span>Revenue</div>
+      <div class="nav-item" onclick="showView('programs')"><span class="nav-icon">📋</span>Programs</div>
+      <div class="nav-item" onclick="showView('messages')"><span class="nav-icon">💬</span>Messages <span id="msg-badge" style="background:var(--red);color:#fff;font-size:10px;padding:1px 5px;border-radius:8px;margin-left:4px;display:none">0</span></div>
+      <div class="nav-item" onclick="showView('settings')"><span class="nav-icon">⚙️</span>Settings</div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="coach-card">
+        <div class="coach-avatar">EF</div>
+        <div>
+          <div class="coach-name">Esteban Frias</div>
+          <div class="coach-role">Head Coach</div>
+        </div>
+      </div>
+      <button onclick="doSignOut()" style="margin-top:12px;width:100%;background:none;border:1px solid var(--border);color:var(--muted);padding:6px;border-radius:6px;font-size:12px;cursor:pointer">Sign out</button>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title" id="view-title">Clients</span>
+      <div class="topbar-actions">
+        <span id="topbar-date" style="color:var(--muted);font-size:13px"></span>
+        <button class="btn-primary" onclick="showView('programs')" id="topbar-cta">+ New Program</button>
+      </div>
+    </div>
+    <div class="content" id="main-content">
+      <!-- Loaded dynamically -->
+    </div>
+  </div>
+
+  <!-- Client detail panel -->
+  <div class="client-detail" id="client-detail">
+    <div class="detail-header">
+      <span style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700">CLIENT PROFILE</span>
+      <button class="detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div id="detail-content"></div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────
+const SUPABASE_URL  = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON = 'YOUR_ANON_KEY';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// ── STATE ──────────────────────────────────────────────────────
+let clients = [];
+let currentView = 'clients';
+let selectedClient = null;
+
+// ── INIT ───────────────────────────────────────────────────────
+document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+sb.auth.getSession().then(({ data: { session }}) => {
+  if (session) showDashboard();
+});
+
+// ── AUTH ───────────────────────────────────────────────────────
+async function doSignIn() {
+  const email = document.getElementById('auth-email').value;
+  const pass  = document.getElementById('auth-pass').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    const el = document.getElementById('auth-error');
+    el.textContent = error.message;
+    el.style.display = 'block';
+  } else {
+    showDashboard();
+  }
+}
+
+async function doSignOut() {
+  await sb.auth.signOut();
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('dashboard').style.display = 'none';
+}
+
+function showDashboard() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'flex';
+  loadClients();
+}
+
+// ── DATA ───────────────────────────────────────────────────────
+async function loadClients() {
+  const { data: { user } } = await sb.auth.getUser();
+  const { data } = await sb.from('profiles')
+    .select('*, body_stats(*), workout_logs(*), messages(*)')
+    .eq('coach_id', user.id)
+    .order('created_at', { ascending: false });
+  clients = data || [];
+  renderCurrentView();
+}
+
+// ── NAVIGATION ─────────────────────────────────────────────────
+function showView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item').forEach((el, i) => {
+    el.classList.toggle('active', ['clients','revenue','programs','messages','settings'][i] === view);
+  });
+  const titles = { clients: 'Clients', revenue: 'Revenue', programs: 'Programs', messages: 'Messages', settings: 'Settings' };
+  document.getElementById('view-title').textContent = titles[view] || view;
+  renderCurrentView();
+}
+
+function renderCurrentView() {
+  const el = document.getElementById('main-content');
+  switch(currentView) {
+    case 'clients':  el.innerHTML = renderClientsView(); break;
+    case 'revenue':  el.innerHTML = renderRevenueView(); break;
+    case 'programs': el.innerHTML = renderProgramsView(); break;
+    case 'messages': el.innerHTML = renderMessagesView(); break;
+    case 'settings': el.innerHTML = renderSettingsView(); break;
+  }
+}
+
+// ── CLIENTS VIEW ───────────────────────────────────────────────
+function renderClientsView() {
+  const active = clients.filter(c => c.subscription_status === 'active').length;
+  const mrr = clients.reduce((sum, c) => {
+    const prices = { app: 19, coached: 299, elite: 599 };
+    return sum + (prices[c.subscription_tier] || 0);
+  }, 0);
+  const avgHrv = clients.length ? Math.round(
+    clients.reduce((s, c) => s + (c.body_stats?.[0]?.hrv_ms || 0), 0) / clients.length
+  ) : 0;
+
+  return `
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Total clients</div>
+        <div class="stat-value">${clients.length}</div>
+        <div class="stat-sub">${active} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Monthly revenue</div>
+        <div class="stat-value">$${mrr.toLocaleString()}</div>
+        <div class="stat-sub">From subscriptions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Coached clients</div>
+        <div class="stat-value">${clients.filter(c => ['coached','elite'].includes(c.subscription_tier)).length}</div>
+        <span class="stat-delta delta-up">↑ vs last month</span>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg client HRV</div>
+        <div class="stat-value">${avgHrv || '—'}<span style="font-size:14px;color:var(--muted)"> ms</span></div>
+        <div class="stat-sub">Fleet health signal</div>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <span class="section-title">All clients</span>
+      <div style="display:flex;gap:8px">
+        <select onchange="filterTier(this.value)" style="background:var(--card);border:1px solid var(--border);color:var(--white);padding:6px 10px;border-radius:6px;font-size:13px">
+          <option value="all">All tiers</option>
+          <option value="elite">Elite</option>
+          <option value="coached">Coached</option>
+          <option value="app">App</option>
+          <option value="free">Free</option>
+        </select>
+      </div>
+    </div>
+
+    ${clients.length === 0 ? `
+      <div class="empty-state">
+        <div class="empty-icon">👥</div>
+        <p>No clients yet. When clients select you as their coach, they'll appear here.</p>
+      </div>
+    ` : `
+      <table class="client-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Tier</th>
+            <th>Last active</th>
+            <th>HRV</th>
+            <th>Workouts (7d)</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${clients.map(c => {
+            const initials = (c.full_name || 'U N').split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            const latestStat = c.body_stats?.[0];
+            const hrv = latestStat?.hrv_ms || null;
+            const recentLogs = (c.workout_logs || []).filter(l => {
+              const d = new Date(l.logged_at);
+              const week = new Date(); week.setDate(week.getDate() - 7);
+              return d >= week;
+            }).length;
+            const tier = c.subscription_tier || 'free';
+            const lastActive = c.workout_logs?.[0]?.logged_at || c.created_at?.split('T')[0];
+            return `
+              <tr class="client-row" onclick="openClient('${c.id}')">
+                <td>
+                  <div class="client-name">
+                    <div class="client-avatar">${initials}</div>
+                    <div>
+                      <div class="client-name-text">${c.full_name || 'Unknown'}</div>
+                      <div class="client-email">${c.email || ''}</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="tier-badge tier-${tier}">${tier.toUpperCase()}</span></td>
+                <td style="color:var(--muted);font-size:13px">${lastActive || '—'}</td>
+                <td>
+                  <div class="hrv-bar">
+                    <span style="font-size:13px;font-weight:600;min-width:32px">${hrv ? hrv : '—'}</span>
+                    ${hrv ? `<div class="hrv-track"><div class="hrv-fill" style="width:${Math.min(hrv/120*100,100)}%"></div></div>` : ''}
+                  </div>
+                </td>
+                <td>
+                  <span style="color:${recentLogs >= 3 ? 'var(--green)' : recentLogs > 0 ? 'var(--gold)' : 'var(--muted)'};font-weight:600">${recentLogs}</span>
+                  <span style="color:var(--muted);font-size:12px"> sessions</span>
+                </td>
+                <td><span class="status-dot status-${c.subscription_status === 'active' ? 'active' : 'inactive'}"></span>${c.subscription_status || 'active'}</td>
+                <td><button class="action-btn" onclick="event.stopPropagation();openClient('${c.id}')">View →</button></td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `}
+  `;
+}
+
+// ── REVENUE VIEW ───────────────────────────────────────────────
+function renderRevenueView() {
+  const prices = { app: 19, coached: 299, elite: 599 };
+  const tierCounts = { free: 0, app: 0, coached: 0, elite: 0 };
+  clients.forEach(c => { if (tierCounts[c.subscription_tier] !== undefined) tierCounts[c.subscription_tier]++; });
+  const mrr = Object.entries(tierCounts).reduce((s, [tier, count]) => s + (prices[tier] || 0) * count, 0);
+  const arr = mrr * 12;
+
+  return `
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-label">MRR</div><div class="stat-value">$${mrr.toLocaleString()}</div><div class="stat-sub">Monthly recurring</div></div>
+      <div class="stat-card"><div class="stat-label">ARR (projected)</div><div class="stat-value">$${arr.toLocaleString()}</div><div class="stat-sub">Annual run rate</div></div>
+      <div class="stat-card"><div class="stat-label">Paying clients</div><div class="stat-value">${clients.filter(c => c.subscription_tier !== 'free').length}</div><div class="stat-sub">of ${clients.length} total</div></div>
+      <div class="stat-card"><div class="stat-label">ARPU</div><div class="stat-value">$${clients.length ? Math.round(mrr / clients.length) : 0}</div><div class="stat-sub">Avg revenue per user</div></div>
+    </div>
+
+    <div class="revenue-grid">
+      <div class="revenue-card">
+        <div class="section-title" style="margin-bottom:16px">REVENUE BY TIER</div>
+        ${Object.entries({ elite: [C='var(--purple)',599], coached: [C='var(--gold)',299], app: [C='var(--blue)',19] }).map(([tier, [color, price]]) => {
+          const count = tierCounts[tier];
+          const rev = count * price;
+          const pct = mrr ? Math.round(rev / mrr * 100) : 0;
+          return `
+            <div class="revenue-bar-row">
+              <span class="revenue-label" style="color:${color}">${tier}</span>
+              <div class="revenue-track"><div class="revenue-fill" style="width:${pct}%;background:${color}"></div></div>
+              <span style="font-size:13px;font-weight:600;min-width:60px;text-align:right">$${rev}/mo</span>
+              <span style="font-size:11px;color:var(--muted);min-width:30px;text-align:right">${count}x</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="revenue-card">
+        <div class="section-title" style="margin-bottom:16px">GROWTH LEVERS</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8">
+          <p>💡 <strong style="color:var(--white)">${tierCounts.free} free users</strong> — conversion target</p>
+          <p>🎯 <strong style="color:var(--white)">App → Coached</strong> = +$280/mo each</p>
+          <p>🚀 <strong style="color:var(--white)">Coached → Elite</strong> = +$300/mo each</p>
+          <p>🏢 <strong style="color:var(--white)">1 white-label client</strong> = +$997/mo</p>
+          <hr style="border-color:var(--border);margin:12px 0">
+          <p>Next $10K MRR: ${Math.ceil((10000 - mrr) / 299)} coached clients or ${Math.ceil((10000 - mrr) / 997)} WL deals</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── PROGRAMS VIEW ──────────────────────────────────────────────
+function renderProgramsView() {
+  return `
+    <div class="section-header">
+      <span class="section-title">PROGRAM TEMPLATES</span>
+      <button class="btn-primary" onclick="alert('Program builder coming — build workout templates and assign to clients')">+ New template</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px">
+      ${[
+        { name: 'Kettlebell 4-Day Split', type: 'Strength', clients: 0, weeks: 8 },
+        { name: 'Soccer Performance', type: 'Sport-specific', clients: 0, weeks: 12 },
+        { name: 'Executive Recomposition', type: 'Body comp', clients: 0, weeks: 16 },
+        { name: 'HRV Recovery Protocol', type: 'Recovery', clients: 0, weeks: 4 },
+        { name: 'Beginner Foundations', type: 'General fitness', clients: 0, weeks: 6 },
+        { name: 'Bilingual HIIT Program', type: 'Cardio / ES', clients: 0, weeks: 8 },
+      ].map(p => `
+        <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px">
+          <div style="font-size:11px;color:var(--gold);letter-spacing:1px;font-weight:700;margin-bottom:6px">${p.type.toUpperCase()}</div>
+          <div style="font-size:15px;font-weight:600;margin-bottom:8px">${p.name}</div>
+          <div style="color:var(--muted);font-size:12px">${p.weeks} weeks · ${p.clients} clients assigned</div>
+          <div style="display:flex;gap:6px;margin-top:12px">
+            <button class="action-btn" style="flex:1">Assign</button>
+            <button class="action-btn">Edit</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ── MESSAGES VIEW ──────────────────────────────────────────────
+function renderMessagesView() {
+  const coached = clients.filter(c => ['coached','elite'].includes(c.subscription_tier));
+  return `
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:0;height:calc(100vh - 120px);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <div style="border-right:1px solid var(--border);overflow-y:auto">
+        <div style="padding:12px;border-bottom:1px solid var(--border);font-size:10px;color:var(--gold);letter-spacing:2px;font-weight:700">COACHED CLIENTS</div>
+        ${coached.length === 0 ? '<div style="padding:20px;color:var(--muted);font-size:13px">No coached clients yet</div>' :
+          coached.map(c => {
+            const initials = (c.full_name||'UN').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            return `
+              <div onclick="selectMessageClient('${c.id}')" style="display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;border-bottom:1px solid var(--border)" onmouseover="this.style.background='rgba(255,255,255,0.03)'" onmouseout="this.style.background='transparent'">
+                <div class="coach-avatar" style="width:34px;height:34px;font-size:12px">${initials}</div>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.full_name}</div>
+                  <div style="font-size:11px;color:var(--muted)">${c.subscription_tier}</div>
+                </div>
+              </div>
+            `;
+          }).join('')
+        }
+      </div>
+      <div style="display:flex;flex-direction:column;padding:20px" id="msg-area">
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:14px">Select a client to message</div>
+      </div>
+    </div>
+  `;
+}
+
+// ── SETTINGS VIEW ─────────────────────────────────────────────
+function renderSettingsView() {
+  return `
+    <div style="max-width:600px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:16px">COACHING PROFILE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          ${[['Display name','Esteban Frias'],['Email','esteban@solaryn.com'],['Max coached clients','20'],['Response SLA','24 hours']].map(([label,val])=>`
+            <div>
+              <div style="font-size:11px;color:var(--muted);letter-spacing:1px;margin-bottom:4px">${label.toUpperCase()}</div>
+              <input style="width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);padding:10px;border-radius:8px;font-size:14px" value="${val}">
+            </div>
+          `).join('')}
+        </div>
+        <button class="btn-primary" style="margin-top:16px">Save changes</button>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:12px">STRIPE INTEGRATION</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Connect Stripe to process subscriptions and receive payouts automatically.</p>
+        <button class="btn-primary">Connect Stripe →</button>
+      </div>
+
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px">
+        <div class="section-title" style="margin-bottom:12px">WHITE-LABEL</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:12px">You can white-label this platform for other coaches. They pay you directly, you handle their client dashboard access.</p>
+        <div style="display:flex;gap:10px">
+          <button class="btn-primary">Create white-label</button>
+          <button class="btn-secondary">View WL clients</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ── CLIENT DETAIL PANEL ────────────────────────────────────────
+function openClient(id) {
+  selectedClient = clients.find(c => c.id === id);
+  if (!selectedClient) return;
+  const c = selectedClient;
+  const initials = (c.full_name||'UN').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+  const latestStat = c.body_stats?.[0];
+  const goals = (c.goals || []).join(', ') || '—';
+  const schedule = c.schedule ? Object.entries(c.schedule).map(([d,t]) => `${['Su','M','Tu','W','Th','F','Sa'][d]}:${t}`).join('  ') : '—';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-profile">
+      <div class="detail-avatar">${initials}</div>
+      <div>
+        <div class="detail-name">${c.full_name || 'Unknown'}</div>
+        <div class="detail-info">${c.email || ''}</div>
+        <div style="margin-top:4px"><span class="tier-badge tier-${c.subscription_tier || 'free'}">${(c.subscription_tier || 'free').toUpperCase()}</span></div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">BODY METRICS</div>
+      ${[['Weight', latestStat?.weight_lbs ? latestStat.weight_lbs + ' lb' : '—'], ['Body fat', latestStat?.body_fat_pct ? latestStat.body_fat_pct + '%' : '—'], ['HRV', latestStat?.hrv_ms ? latestStat.hrv_ms + ' ms' : '—'], ['Sleep', latestStat?.sleep_hrs ? latestStat.sleep_hrs + ' hrs' : '—']].map(([label,val])=>`
+        <div class="metric-row"><span class="metric-label">${label}</span><span class="metric-value">${val}</span></div>
+      `).join('')}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">PROFILE</div>
+      ${[['Goals', goals], ['Equipment', (c.equipment||[]).join(', ')||'—'], ['Schedule', schedule], ['Language', c.language === 'es' ? 'Español' : 'English'], ['Level', c.activity_level || '—']].map(([label,val])=>`
+        <div class="metric-row"><span class="metric-label">${label}</span><span class="metric-value" style="font-size:12px;text-align:right;max-width:220px;color:var(--muted)">${val}</span></div>
+      `).join('')}
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">SEND MESSAGE</div>
+      <div id="msg-thread" style="max-height:200px;overflow-y:auto;margin-bottom:8px"></div>
+      <div class="msg-input-row">
+        <input class="msg-input" id="coach-msg-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendCoachMsg('${c.id}')">
+        <button class="msg-send" onclick="sendCoachMsg('${c.id}')">↑</button>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">ACTIONS</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <button class="action-btn gold">Assign program</button>
+        <button class="action-btn">View full logs</button>
+        <button class="action-btn">Schedule call</button>
+        <button class="action-btn" style="color:var(--red);border-color:var(--red)">Remove client</button>
+      </div>
+    </div>
+  `;
+
+  loadClientMessages(id);
+  document.getElementById('client-detail').classList.add('open');
+}
+
+function closeDetail() {
+  document.getElementById('client-detail').classList.remove('open');
+  selectedClient = null;
+}
+
+async function loadClientMessages(clientId) {
+  const { data: { user } } = await sb.auth.getUser();
+  const { data } = await sb.from('messages')
+    .select('*')
+    .or(`sender_id.eq.${user.id},receiver_id.eq.${user.id}`)
+    .or(`sender_id.eq.${clientId},receiver_id.eq.${clientId}`)
+    .order('created_at', { ascending: true })
+    .limit(20);
+  
+  const thread = document.getElementById('msg-thread');
+  if (!thread || !data?.length) return;
+  thread.innerHTML = data.map(m => `
+    <div class="msg-bubble ${m.sender_id === user.id ? 'msg-coach' : 'msg-client'}">
+      <div class="msg-time">${m.sender_id === user.id ? 'You' : selectedClient?.full_name} · ${new Date(m.created_at).toLocaleDateString()}</div>
+      ${m.content}
+    </div>
+  `).join('');
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function sendCoachMsg(clientId) {
+  const input = document.getElementById('coach-msg-input');
+  if (!input?.value.trim()) return;
+  const { data: { user } } = await sb.auth.getUser();
+  const content = input.value.trim();
+  input.value = '';
+  
+  await sb.from('messages').insert({ sender_id: user.id, receiver_id: clientId, content });
+  loadClientMessages(clientId);
+}
+
+function filterTier(tier) {
+  // Re-render with filtered clients
+  const el = document.getElementById('main-content');
+  const filtered = tier === 'all' ? clients : clients.filter(c => c.subscription_tier === tier);
+  const temp = clients;
+  clients = filtered;
+  el.innerHTML = renderClientsView();
+  clients = temp;
+}
+
+function selectMessageClient(id) {
+  openClient(id);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0A0F">
+<title>Solaryn Fit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --surface: #111118;
+  --card: #16161F;
+  --border: #1E1E2A;
+  --gold: #C9A84C;
+  --gold-dim: rgba(201,168,76,0.12);
+  --gold-border: rgba(201,168,76,0.3);
+  --white: #F0EFE8;
+  --muted: #6B6A7A;
+  --dim: #2A2A38;
+  --green: #2ECC71;
+  --blue: #4A9EFF;
+  --red: #E74C3C;
+  --safe-top: env(safe-area-inset-top, 44px);
+  --safe-bottom: env(safe-area-inset-bottom, 34px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; }
+#app { height: 100%; display: flex; flex-direction: column; }
+
+/* SCREENS */
+.screen { display: none; flex-direction: column; height: 100%; }
+.screen.active { display: flex; }
+
+/* AUTH */
+#auth-screen { background: var(--bg); align-items: center; justify-content: center; padding: 32px 24px; padding-top: calc(var(--safe-top) + 32px); }
+.brand-mark { width: 72px; height: 72px; border-radius: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 32px; }
+.brand-name { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--gold); letter-spacing: 3px; margin-bottom: 6px; }
+.brand-sub { color: var(--muted); font-size: 13px; letter-spacing: 1px; margin-bottom: 48px; }
+.input-group { width: 100%; margin-bottom: 12px; }
+.input-group label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 2px; font-weight: 500; margin-bottom: 6px; }
+.inp { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; color: var(--white); font-size: 16px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+.inp:focus { border-color: var(--gold-border); }
+.btn-primary { width: 100%; background: var(--gold); border: none; border-radius: 12px; padding: 16px; color: #0A0A0F; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 8px; letter-spacing: 0.5px; transition: opacity 0.2s; }
+.btn-primary:active { opacity: 0.8; }
+.btn-ghost { background: none; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--muted); font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; width: 100%; margin-top: 8px; transition: border-color 0.2s; }
+.btn-ghost:active { border-color: var(--gold-border); }
+.auth-toggle { margin-top: 20px; font-size: 13px; color: var(--muted); cursor: pointer; }
+.auth-toggle span { color: var(--gold); }
+.auth-error { color: var(--red); font-size: 13px; margin-top: 8px; text-align: center; min-height: 18px; }
+
+/* MAIN APP */
+#main-screen { background: var(--bg); }
+.content-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--safe-bottom) + 70px); }
+.content-area::-webkit-scrollbar { display: none; }
+
+/* NAV */
+.nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); padding-top: 8px; z-index: 100; }
+.nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 0; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; border: none; background: none; }
+.nav-item.active { opacity: 1; }
+.nav-icon { font-size: 20px; }
+.nav-label { font-size: 10px; color: var(--gold); letter-spacing: 0.5px; font-weight: 500; }
+.nav-item:not(.active) .nav-label { color: var(--muted); }
+
+/* HEADER */
+.page-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; justify-content: space-between; }
+.page-title { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--gold); letter-spacing: 2px; font-weight: 500; }
+.page-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* CARDS */
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin: 0 16px 12px; }
+.card-label { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; }
+.card-gold { border-color: var(--gold-border); background: var(--gold-dim); }
+
+/* TODAY - METRICS */
+.metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.metric-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
+.metric-val { font-size: 20px; font-weight: 700; color: var(--gold); font-family: 'DM Mono', monospace; }
+.metric-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
+.metric-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* TODAY - WORKOUT */
+.workout-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; margin: 0 16px 12px; overflow: hidden; }
+.workout-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+.workout-type { font-size: 15px; font-weight: 600; }
+.workout-badge { font-size: 10px; background: var(--gold-dim); color: var(--gold); border: 1px solid var(--gold-border); border-radius: 6px; padding: 3px 8px; letter-spacing: 1px; font-weight: 700; }
+.exercise-row { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.exercise-row:last-child { border-bottom: none; }
+.exercise-name { font-size: 14px; font-weight: 500; }
+.exercise-sets { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.exercise-check { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+.exercise-check.done { background: var(--green); border-color: var(--green); }
+
+/* COACH */
+.chat-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
+.chat-area::-webkit-scrollbar { display: none; }
+.msg { max-width: 85%; }
+.msg.user { align-self: flex-end; }
+.msg.assistant { align-self: flex-start; }
+.msg-bubble { padding: 12px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5; }
+.msg.user .msg-bubble { background: var(--gold); color: #0A0A0F; border-bottom-right-radius: 4px; font-weight: 500; }
+.msg.assistant .msg-bubble { background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; color: var(--white); }
+.msg-time { font-size: 10px; color: var(--muted); margin-top: 4px; padding: 0 4px; }
+.msg.user .msg-time { text-align: right; }
+.typing-indicator { display: flex; gap: 4px; padding: 14px; }
+.typing-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: typing 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typing { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
+.chat-input-row { padding: 12px 16px; padding-bottom: calc(var(--safe-bottom) + 78px); background: var(--surface); border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-end; }
+#chat-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--white); font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; resize: none; max-height: 120px; min-height: 44px; line-height: 1.4; }
+#chat-input:focus { border-color: var(--gold-border); }
+.send-btn { width: 44px; height: 44px; border-radius: 12px; background: var(--gold); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
+.send-btn:active { opacity: 0.7; }
+.send-btn svg { width: 18px; height: 18px; fill: #0A0A0F; }
+.suggestions { padding: 8px 16px 0; display: flex; gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.suggestions::-webkit-scrollbar { display: none; }
+.suggestion-chip { flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+.suggestion-chip:active { border-color: var(--gold-border); color: var(--gold); }
+
+/* PROFILE */
+.profile-header { padding: calc(var(--safe-top) + 20px) 20px 20px; text-align: center; }
+.avatar { width: 72px; height: 72px; border-radius: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 12px; }
+.profile-name { font-size: 20px; font-weight: 700; }
+.profile-tier { font-size: 11px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin-top: 4px; }
+.settings-group { margin: 0 16px 16px; }
+.settings-label { font-size: 10px; color: var(--muted); letter-spacing: 2px; font-weight: 700; margin-bottom: 8px; padding-left: 4px; }
+.settings-row { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer; }
+.settings-row-label { font-size: 14px; font-weight: 500; }
+.settings-row-val { font-size: 13px; color: var(--muted); }
+.signout-btn { margin: 0 16px; background: none; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--red); font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; width: calc(100% - 32px); transition: border-color 0.2s; }
+.signout-btn:active { border-color: var(--red); }
+
+/* TOAST */
+.toast { position: fixed; top: calc(var(--safe-top) + 16px); left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; color: var(--white); z-index: 1000; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.toast.show { opacity: 1; }
+
+/* LOADING */
+.loader { display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; gap: 16px; }
+.spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* DAYS SCHEDULE */
+.days-row { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
+.day-pill { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
+.day-pill.today { background: var(--gold-dim); border-color: var(--gold-border); }
+.day-name { font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+.day-pill.today .day-name { color: var(--gold); }
+.day-type { font-size: 14px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen" class="screen active">
+  <div class="brand-mark">☀️</div>
+  <div class="brand-name">SOLARYN</div>
+  <div class="brand-sub">FITNESS · AI · DATA</div>
+  <div class="input-group">
+    <label>EMAIL</label>
+    <input id="auth-email" class="inp" type="email" placeholder="you@email.com" autocomplete="email">
+  </div>
+  <div class="input-group">
+    <label>PASSWORD</label>
+    <input id="auth-password" class="inp" type="password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+  <div id="auth-error" class="auth-error"></div>
+  <button class="btn-primary" onclick="signIn()">Sign In</button>
+  <button class="btn-ghost" onclick="signUp()">Create Account</button>
+  <div class="auth-toggle" onclick="toggleAuthMode()">
+    <span id="auth-toggle-text">New here? <span>Create an account →</span></span>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-screen" class="screen">
+
+  <!-- TODAY TAB -->
+  <div id="tab-today" class="tab-content active" style="display:flex;flex-direction:column;height:100%">
+    <div class="content-area" id="today-scroll">
+      <div class="page-header">
+        <div>
+          <div class="page-title">TODAY</div>
+          <div class="page-sub" id="today-date"></div>
+        </div>
+        <div style="font-size:24px" id="today-greeting">👋</div>
+      </div>
+
+      <!-- Week strip -->
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-label">THIS WEEK</div>
+        <div class="days-row" id="week-strip"></div>
+      </div>
+
+      <!-- HRV Card -->
+      <div class="card card-gold" id="hrv-card">
+        <div class="card-label">READINESS</div>
+        <div class="metrics-row">
+          <div class="metric-tile">
+            <div class="metric-val" id="hrv-val">—</div>
+            <div class="metric-label">HRV ms</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-val" id="sleep-val">—</div>
+            <div class="metric-label">SLEEP h</div>
+          </div>
+          <div class="metric-tile">
+            <div class="metric-val" id="rhr-val">—</div>
+            <div class="metric-label">RHR bpm</div>
+          </div>
+        </div>
+        <div id="readiness-msg" style="margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5"></div>
+        <button onclick="logMetrics()" style="margin-top:10px;background:none;border:1px solid var(--gold-border);border-radius:8px;padding:8px 14px;color:var(--gold);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:1px">+ LOG METRICS</button>
+      </div>
+
+      <!-- Today's workout -->
+      <div class="workout-card" id="workout-card">
+        <div class="workout-header">
+          <div>
+            <div class="workout-type" id="workout-title">Loading...</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px" id="workout-meta"></div>
+          </div>
+          <div class="workout-badge" id="workout-badge">TODAY</div>
+        </div>
+        <div id="exercise-list"></div>
+      </div>
+
+      <!-- Ask coach -->
+      <div class="card" style="cursor:pointer" onclick="switchTab('coach')">
+        <div class="card-label">AI COACH</div>
+        <div style="font-size:14px;color:var(--white);line-height:1.5" id="coach-preview">Ask me anything about today's training, recovery, or nutrition →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COACH TAB -->
+  <div id="tab-coach" class="tab-content" style="display:none;flex-direction:column;height:100%">
+    <div class="page-header">
+      <div>
+        <div class="page-title">AI COACH</div>
+        <div class="page-sub" id="coach-tier-label">Powered by Claude</div>
+      </div>
+      <div style="font-size:20px">🤖</div>
+    </div>
+    <div class="suggestions" id="suggestions-row">
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">What should I do today?</div>
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">How's my recovery?</div>
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">Plan this week's training</div>
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">Pre-workout meal ideas</div>
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">Kettlebell program</div>
+    </div>
+    <div class="chat-area" id="chat-area"></div>
+    <div class="chat-input-row">
+      <textarea id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+      <button class="send-btn" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="tab-content" style="display:none;flex-direction:column;height:100%">
+    <div class="content-area">
+      <div class="profile-header">
+        <div class="avatar">⚡</div>
+        <div class="profile-name" id="profile-name">Loading...</div>
+        <div class="profile-tier" id="profile-tier">FREE TIER</div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">INVITE CODE</div>
+        <div class="card" style="margin:0 0 12px">
+          <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Have an invite code? Enter it to unlock your tier.</div>
+          <div style="display:flex;gap:8px">
+            <input id="invite-input" class="inp" placeholder="SOLARYN-BETA" style="flex:1;padding:10px 12px;font-size:14px;text-transform:uppercase">
+            <button onclick="redeemCode()" style="background:var(--gold);border:none;border-radius:10px;padding:10px 16px;color:#0A0A0F;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">REDEEM</button>
+          </div>
+          <div id="invite-result" style="margin-top:8px;font-size:13px;min-height:18px"></div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">ACCOUNT</div>
+        <div class="settings-row">
+          <div class="settings-row-label">Email</div>
+          <div class="settings-row-val" id="profile-email">—</div>
+        </div>
+        <div class="settings-row" onclick="switchTab('today')">
+          <div class="settings-row-label">Today's Training</div>
+          <div class="settings-row-val">→</div>
+        </div>
+        <div class="settings-row" onclick="switchTab('coach')">
+          <div class="settings-row-label">AI Coach</div>
+          <div class="settings-row-val">→</div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">DATA</div>
+        <div class="settings-row">
+          <div class="settings-row-label">Apple Health</div>
+          <div class="settings-row-val" id="health-status">Not connected</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-label">Genomic Data</div>
+          <div class="settings-row-val" id="genomic-status">Not uploaded</div>
+        </div>
+      </div>
+
+      <button class="signout-btn" onclick="signOut()">Sign Out</button>
+      <div style="height:20px"></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="nav-bar">
+    <button class="nav-item active" id="nav-today" onclick="switchTab('today')">
+      <span class="nav-icon">⚡</span>
+      <span class="nav-label">TODAY</span>
+    </button>
+    <button class="nav-item" id="nav-coach" onclick="switchTab('coach')">
+      <span class="nav-icon">🤖</span>
+      <span class="nav-label">COACH</span>
+    </button>
+    <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
+      <span class="nav-icon">👤</span>
+      <span class="nav-label">PROFILE</span>
+    </button>
+  </nav>
+</div>
+
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOG METRICS MODAL -->
+<div id="metrics-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;align-items:flex-end">
+  <div style="background:var(--card);border-top-left-radius:20px;border-top-right-radius:20px;padding:24px;width:100%;border-top:1px solid var(--border);padding-bottom:calc(var(--safe-bottom)+24px)">
+    <div style="font-size:16px;font-weight:700;margin-bottom:16px">Log Today's Metrics</div>
+    <div class="input-group"><label>HRV (ms)</label><input id="log-hrv" class="inp" type="number" placeholder="e.g. 58"></div>
+    <div class="input-group"><label>SLEEP (hours)</label><input id="log-sleep" class="inp" type="number" step="0.1" placeholder="e.g. 7.5"></div>
+    <div class="input-group"><label>RESTING HR (bpm)</label><input id="log-rhr" class="inp" type="number" placeholder="e.g. 54"></div>
+    <div class="input-group"><label>WEIGHT (lbs)</label><input id="log-weight" class="inp" type="number" step="0.1" placeholder="e.g. 185.5"></div>
+    <button class="btn-primary" onclick="saveMetrics()">Save</button>
+    <button class="btn-ghost" onclick="closeMetrics()">Cancel</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://bhjmebxgcmcmwoeqxxvs.supabase.co';
+const SUPABASE_ANON = 'sb_publishable_tY3mw8BgW-U9qgs4FUUxIg_t2qDwEVQ';
+const API_URL = 'https://solaryn-fit.vercel.app/api/coach';
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+let currentUser = null;
+let currentProfile = null;
+let chatHistory = [];
+let exerciseDone = {};
+
+const SCHEDULE = {
+  0: { type: 'recovery', label: 'Recovery', icon: '🧘', exercises: [
+    { name: 'Foam Rolling', sets: '10 min', notes: 'Full body' },
+    { name: 'Mobility Flow', sets: '15 min', notes: 'Hip + thoracic' },
+    { name: 'Breathing', sets: '5 min', notes: 'Box breathing' }
+  ]},
+  1: { type: 'soccer', label: 'Soccer', icon: '⚽', exercises: [
+    { name: 'Dynamic Warmup', sets: '10 min', notes: 'Before game' },
+    { name: 'Indoor Soccer', sets: '60-75 min', notes: 'Full intensity' },
+    { name: 'Cooldown Stretch', sets: '10 min', notes: 'Hip flexors + hamstrings' }
+  ]},
+  2: { type: 'pilates', label: 'Pilates', icon: '🤸', exercises: [
+    { name: 'Pilates Class', sets: '45-55 min', notes: 'Core focus' },
+    { name: 'Accessory Work', sets: '15 min', notes: 'Glutes + posterior chain' }
+  ]},
+  3: { type: 'kettlebell', label: 'Kettlebell', icon: '🏋️', exercises: [
+    { name: 'KB Swing', sets: '5×20', notes: 'Hip hinge, snap at top' },
+    { name: 'Turkish Get-Up', sets: '3×3 each side', notes: 'Slow and controlled' },
+    { name: 'KB Clean & Press', sets: '4×5 each', notes: 'Lat-packed overhead' },
+    { name: 'Goblet Squat', sets: '4×12', notes: 'Elbows inside knees' },
+    { name: 'KB Row', sets: '3×10 each', notes: 'Hinge and pull' }
+  ]},
+  4: { type: 'soccer', label: 'Soccer', icon: '⚽', exercises: [
+    { name: 'Dynamic Warmup', sets: '10 min', notes: 'Before game' },
+    { name: 'Indoor Soccer', sets: '60-75 min', notes: 'Full intensity' },
+    { name: 'Cooldown Stretch', sets: '10 min', notes: 'Hip flexors + hamstrings' }
+  ]},
+  5: { type: 'run', label: 'Run', icon: '🏃', exercises: [
+    { name: 'Easy Run', sets: '25-35 min', notes: 'Zone 2, conversational pace' },
+    { name: 'Strides', sets: '4×20 sec', notes: 'After easy run, relaxed' },
+    { name: 'Core Work', sets: '10 min', notes: 'Plank variations' }
+  ]},
+  6: { type: 'recovery', label: 'Recovery', icon: '😴', exercises: [
+    { name: 'Walk', sets: '20-30 min', notes: 'Easy pace' },
+    { name: 'Stretching', sets: '15 min', notes: 'Full body' },
+    { name: 'Sauna / Ice Bath', sets: 'Optional', notes: 'If available' }
+  ]}
+};
+
+// ── INIT ──────────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    await loadProfile();
+    showApp();
+  }
+});
+
+sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_IN' && session) {
+    currentUser = session.user;
+    await loadProfile();
+    showApp();
+  } else if (event === 'SIGNED_OUT') {
+    currentUser = null;
+    currentProfile = null;
+    showAuth();
+  }
+});
+
+// ── AUTH ──────────────────────────────────────────────────────
+let isSignUp = false;
+
+function toggleAuthMode() {
+  isSignUp = !isSignUp;
+  document.getElementById('auth-toggle-text').innerHTML = isSignUp
+    ? 'Already have an account? <span>Sign in →</span>'
+    : 'New here? <span>Create an account →</span>';
+}
+
+async function signIn() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) errEl.textContent = error.message;
+}
+
+async function signUp() {
+  const email = document.getElementById('auth-email').value.trim();
+  const pass = document.getElementById('auth-password').value;
+  const errEl = document.getElementById('auth-error');
+  errEl.textContent = '';
+  if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
+  if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
+  const { error } = await sb.auth.signUp({ email, password: pass });
+  if (error) errEl.textContent = error.message;
+  else errEl.style.color = 'var(--green)', errEl.textContent = 'Account created! Check your email to confirm.';
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+}
+
+function showAuth() {
+  document.getElementById('auth-screen').classList.add('active');
+  document.getElementById('main-screen').classList.remove('active');
+}
+
+function showApp() {
+  document.getElementById('auth-screen').classList.remove('active');
+  document.getElementById('main-screen').classList.add('active');
+  initToday();
+  loadTodayMetrics();
+}
+
+// ── PROFILE ───────────────────────────────────────────────────
+async function loadProfile() {
+  if (!currentUser) return;
+  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+  currentProfile = data;
+  if (data) {
+    document.getElementById('profile-name').textContent = data.full_name || data.email?.split('@')[0] || 'Athlete';
+    document.getElementById('profile-email').textContent = data.email || currentUser.email;
+    const tier = data.subscription_tier?.toUpperCase() || 'FREE';
+    document.getElementById('profile-tier').textContent = tier + ' TIER';
+    document.getElementById('coach-tier-label').textContent =
+      (tier === 'ELITE' || tier === 'COACHED') ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
+
+    // Check access override
+    const { data: override } = await sb.rpc('get_access_override', {
+      p_user_id: currentUser.id, p_email: currentUser.email
+    });
+    if (override?.length) {
+      const t = override[0].tier.toUpperCase();
+      document.getElementById('profile-tier').textContent = t + ' TIER ✦';
+    }
+  }
+}
+
+// ── TODAY ─────────────────────────────────────────────────────
+function initToday() {
+  const now = new Date();
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('today-date').textContent =
+    `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
+
+  const hour = now.getHours();
+  document.getElementById('today-greeting').textContent =
+    hour < 12 ? '🌅' : hour < 17 ? '☀️' : '🌙';
+
+  buildWeekStrip(now);
+  buildWorkout(now.getDay());
+}
+
+function buildWeekStrip(now) {
+  const strip = document.getElementById('week-strip');
+  const days = ['S','M','T','W','T','F','S'];
+  const today = now.getDay();
+  strip.innerHTML = days.map((d, i) => {
+    const sched = SCHEDULE[i];
+    return `<div class="day-pill ${i === today ? 'today' : ''}">
+      <div class="day-name">${d}</div>
+      <div class="day-type">${sched.icon}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildWorkout(dayOfWeek) {
+  const sched = SCHEDULE[dayOfWeek];
+  document.getElementById('workout-title').textContent = sched.label;
+  document.getElementById('workout-meta').textContent = `${sched.exercises.length} exercises`;
+  document.getElementById('workout-badge').textContent = sched.type.toUpperCase();
+
+  const list = document.getElementById('exercise-list');
+  list.innerHTML = sched.exercises.map((ex, i) => `
+    <div class="exercise-row">
+      <div>
+        <div class="exercise-name">${ex.name}</div>
+        <div class="exercise-sets">${ex.sets} · ${ex.notes}</div>
+      </div>
+      <div class="exercise-check ${exerciseDone[i] ? 'done' : ''}" onclick="toggleExercise(${i}, this)">
+        ${exerciseDone[i] ? '✓' : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+function toggleExercise(i, el) {
+  exerciseDone[i] = !exerciseDone[i];
+  el.classList.toggle('done');
+  el.textContent = exerciseDone[i] ? '✓' : '';
+}
+
+async function loadTodayMetrics() {
+  if (!currentUser) return;
+  const today = new Date().toISOString().split('T')[0];
+  const { data } = await sb.from('health_syncs')
+    .select('*').eq('user_id', currentUser.id).eq('synced_date', today).single();
+
+  if (data) {
+    if (data.hrv_ms) {
+      document.getElementById('hrv-val').textContent = data.hrv_ms;
+      const msg = data.hrv_ms >= 70 ? '💚 High HRV — you\'re primed to train hard today.'
+        : data.hrv_ms >= 50 ? '🟡 Normal HRV — train as planned.'
+        : data.hrv_ms >= 35 ? '🟠 Low HRV — consider reducing intensity today.'
+        : '🔴 Very low HRV — prioritize recovery over training.';
+      document.getElementById('readiness-msg').textContent = msg;
+    }
+    if (data.sleep_hrs) document.getElementById('sleep-val').textContent = data.sleep_hrs;
+    if (data.resting_hr) document.getElementById('rhr-val').textContent = data.resting_hr;
+  }
+}
+
+// ── METRICS MODAL ─────────────────────────────────────────────
+function logMetrics() {
+  document.getElementById('metrics-modal').style.display = 'flex';
+}
+function closeMetrics() {
+  document.getElementById('metrics-modal').style.display = 'none';
+}
+async function saveMetrics() {
+  if (!currentUser) return;
+  const hrv = parseFloat(document.getElementById('log-hrv').value) || null;
+  const sleep = parseFloat(document.getElementById('log-sleep').value) || null;
+  const rhr = parseInt(document.getElementById('log-rhr').value) || null;
+  const weight = parseFloat(document.getElementById('log-weight').value) || null;
+  const today = new Date().toISOString().split('T')[0];
+
+  await sb.from('health_syncs').upsert({
+    user_id: currentUser.id,
+    synced_date: today,
+    hrv_ms: hrv, sleep_hrs: sleep, resting_hr: rhr, weight_lbs: weight
+  }, { onConflict: 'user_id,synced_date' });
+
+  closeMetrics();
+  loadTodayMetrics();
+  showToast('Metrics saved ✓');
+}
+
+// ── CHAT ──────────────────────────────────────────────────────
+function sendSuggestion(el) {
+  document.getElementById('chat-input').value = el.textContent;
+  sendMessage();
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = '44px';
+
+  addMessage('user', text);
+  chatHistory.push({ role: 'user', content: text });
+
+  const typing = addTyping();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: chatHistory,
+        user_id: currentUser?.id
+      })
+    });
+    const data = await res.json();
+    const reply = data.content || 'Sorry, something went wrong.';
+    typing.remove();
+    addMessage('assistant', reply);
+    chatHistory.push({ role: 'assistant', content: reply });
+  } catch (e) {
+    typing.remove();
+    addMessage('assistant', 'Connection error. Check your internet and try again.');
+  }
+}
+
+function addMessage(role, text) {
+  const area = document.getElementById('chat-area');
+  const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  div.innerHTML = `
+    <div class="msg-bubble">${text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
+    <div class="msg-time">${now}</div>
+  `;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const area = document.getElementById('chat-area');
+  const div = document.createElement('div');
+  div.className = 'msg assistant';
+  div.innerHTML = `<div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+// ── INVITE CODE ───────────────────────────────────────────────
+async function redeemCode() {
+  const code = document.getElementById('invite-input').value.trim().toUpperCase();
+  const result = document.getElementById('invite-result');
+  if (!code) return;
+  if (!currentUser) { result.style.color = 'var(--red)'; result.textContent = 'Sign in first'; return; }
+
+  const { data, error } = await sb.rpc('redeem_invite_code', {
+    p_code: code, p_user_id: currentUser.id
+  });
+
+  if (error || !data?.success) {
+    result.style.color = 'var(--red)';
+    result.textContent = data?.error || 'Invalid code';
+  } else {
+    result.style.color = 'var(--green)';
+    result.textContent = `✓ ${data.message} — ${data.tier.toUpperCase()} tier unlocked`;
+    await loadProfile();
+    showToast('Access unlocked 🎉');
+  }
+}
+
+// ── NAV ───────────────────────────────────────────────────────
+function switchTab(tab) {
+  ['today', 'coach', 'profile'].forEach(t => {
+    document.getElementById(`tab-${t}`).style.display = t === tab ? 'flex' : 'none';
+    document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
+  });
+  if (tab === 'coach' && chatHistory.length === 0) {
+    setTimeout(() => {
+      const today = new Date().getDay();
+      const sched = SCHEDULE[today];
+      addMessage('assistant', `Hey! Today is ${sched.label} day ${sched.icon}\n\nI'm your AI coach. Ask me anything — what to do today, how to optimize your recovery, nutrition timing, or just talk through your training. What's on your mind?`);
+    }, 300);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

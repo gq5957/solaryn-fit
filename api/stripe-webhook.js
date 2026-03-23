@@ -1,7 +1,7 @@
 // api/stripe-webhook.js — Handle Stripe subscription events
 // Set webhook URL in Stripe dashboard: https://your-domain.vercel.app/api/stripe-webhook
 
-import { createClient } from '@supabase/supabase-js';
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -14,7 +14,7 @@ const TIER_MAP = {
   [process.env.STRIPE_ELITE_PRICE_ID]:   'elite',
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const sig = req.headers['stripe-signature'];
@@ -93,4 +93,4 @@ export default async function handler(req, res) {
   res.status(200).json({ received: true });
 }
 
-export const config = { api: { bodyParser: false } };
+module.exports.config = { api: { bodyParser: false } };

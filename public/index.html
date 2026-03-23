@@ -453,7 +453,7 @@ async function signUp() {
   if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
   const { error } = await sb.auth.signUp({ email, password: pass });
   if (error) errEl.textContent = error.message;
-  else errEl.style.color = 'var(--green)', errEl.textContent = 'Account created! Check your email to confirm.';
+  else { currentUser = null; showToast("Account created! Signing you in..."); const { error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass }); if (signInErr) errEl.textContent = signInErr.message; };
 }
 
 async function signOut() {

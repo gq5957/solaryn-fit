@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Solaryn Fit",
+    "slug": "solaryn-fit",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0A0A0F"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.solaryn.fit",
+      "infoPlist": {
+        "NSHealthShareUsageDescription": "Solaryn Fit reads your health data to personalize your training recommendations.",
+        "NSHealthUpdateUsageDescription": "Solaryn Fit may write workout data back to Apple Health."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0A0A0F"
+      },
+      "package": "com.solaryn.fit"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "plugins": []
+  }
+}

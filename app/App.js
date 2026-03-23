@@ -18,8 +18,8 @@ const { width } = Dimensions.get('window');
 const isWeb = Platform.OS === 'web';
 
 // ── CONFIG (replace with your values) ─────────────────────────
-const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL  || 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON || 'YOUR_ANON_KEY';
+const SUPABASE_URL  = process.env.EXPO_PUBLIC_SUPABASE_URL  || 'https://bhjmebxgcmcmwoeqxxvs.supabase.co';
+const SUPABASE_ANON = process.env.EXPO_PUBLIC_SUPABASE_ANON || 'sb_publishable_tY3mw8BgW-U9qgs4FUUxIg_t2qDwEVQ';
 const STRIPE_KEY    = process.env.EXPO_PUBLIC_STRIPE_KEY    || 'pk_test_YOUR_KEY';
 const API_BASE      = process.env.EXPO_PUBLIC_API_URL        || 'https://solaryn-fit.vercel.app/api';
 

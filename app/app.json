@@ -7,6 +7,8 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
       "backgroundColor": "#0A0A0F"
     },
     "assetBundlePatterns": ["**/*"],
@@ -20,13 +22,14 @@
     },
     "android": {
       "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0A0A0F"
       },
       "package": "com.solaryn.fit"
     },
     "web": {
-      "bundler": "metro"
-    },
-    "plugins": []
+      "bundler": "metro",
+      "favicon": "./assets/icon.png"
+    }
   }
 }

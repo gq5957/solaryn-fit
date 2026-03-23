@@ -1191,3 +1191,4 @@ const s = StyleSheet.create({
   navActive:      { color: C.gold, fontWeight: '700' },
   navDot:         { width: 4, height: 4, borderRadius: 2, backgroundColor: C.gold, marginTop: 2 },
 });
+

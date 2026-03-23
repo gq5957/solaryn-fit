@@ -144,6 +144,41 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ONBOARDING */
+#onboarding-screen { background: var(--bg); padding: 0; }
+.ob-step { display: none; flex-direction: column; height: 100%; padding: calc(var(--safe-top) + 24px) 24px 40px; }
+.ob-step.active { display: flex; }
+.ob-progress { display: flex; gap: 6px; margin-bottom: 32px; }
+.ob-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+.ob-dot.done { background: var(--gold); }
+.ob-step-num { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
+.ob-title { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+.ob-sub { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 32px; }
+.ob-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.ob-option { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 14px; }
+.ob-option.selected { border-color: var(--gold); background: var(--gold-dim); }
+.ob-option-icon { font-size: 24px; width: 36px; text-align: center; }
+.ob-option-text { flex: 1; }
+.ob-option-label { font-size: 15px; font-weight: 600; }
+.ob-option-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.ob-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
+.ob-option.selected .ob-check { background: var(--gold); border-color: var(--gold); color: #0A0A0F; }
+.ob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
+.ob-grid .ob-option { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; }
+.ob-next { background: var(--gold); border: none; border-radius: 14px; padding: 18px; color: #0A0A0F; font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 20px; transition: opacity 0.2s; letter-spacing: 0.5px; }
+.ob-next:active { opacity: 0.8; }
+.ob-next:disabled { opacity: 0.3; cursor: default; }
+.ob-skip { background: none; border: none; color: var(--muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 12px; margin-top: 4px; }
+.ob-name-input { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px; color: var(--white); font-size: 22px; font-weight: 600; font-family: 'DM Sans', sans-serif; outline: none; width: 100%; transition: border-color 0.2s; }
+.ob-name-input:focus { border-color: var(--gold-border); }
+.ob-day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
+.ob-day-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.ob-day-btn.active { border-color: var(--gold); background: var(--gold-dim); }
+.ob-day-name { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.ob-day-btn.active .ob-day-name { color: var(--gold); }
+.ob-day-emoji { font-size: 18px; margin-top: 4px; }
+.ob-type-select { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--white); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; width: 100%; margin-top: 6px; }
+
 /* DAYS SCHEDULE */
 .days-row { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
 .day-pill { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
@@ -175,6 +210,128 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   <div class="auth-toggle" onclick="toggleAuthMode()">
     <span id="auth-toggle-text">New here? <span>Create an account →</span></span>
   </div>
+</div>
+
+<!-- ONBOARDING SCREEN -->
+<div id="onboarding-screen" class="screen">
+
+  <!-- Progress dots -->
+  <div style="position:fixed;top:0;left:0;right:0;padding:calc(var(--safe-top) + 12px) 24px 0;z-index:10;background:var(--bg)">
+    <div class="ob-progress">
+      <div class="ob-dot" id="ob-dot-0"></div>
+      <div class="ob-dot" id="ob-dot-1"></div>
+      <div class="ob-dot" id="ob-dot-2"></div>
+      <div class="ob-dot" id="ob-dot-3"></div>
+      <div class="ob-dot" id="ob-dot-4"></div>
+    </div>
+  </div>
+
+  <!-- STEP 0: Name -->
+  <div class="ob-step" id="ob-step-0" style="padding-top:calc(var(--safe-top) + 72px)">
+    <div class="ob-step-num">STEP 1 OF 5</div>
+    <div class="ob-title">What should I call you?</div>
+    <div class="ob-sub">Your AI coach will use this to personalize every interaction.</div>
+    <input class="ob-name-input" id="ob-name" placeholder="Your first name" autocomplete="given-name" oninput="document.getElementById('ob-next-0').disabled = !this.value.trim()">
+    <div style="flex:1"></div>
+    <button class="ob-next" id="ob-next-0" disabled onclick="obNext(1)">Continue →</button>
+  </div>
+
+  <!-- STEP 1: Goal -->
+  <div class="ob-step" id="ob-step-1" style="padding-top:calc(var(--safe-top) + 72px)">
+    <div class="ob-step-num">STEP 2 OF 5</div>
+    <div class="ob-title">What's your primary goal?</div>
+    <div class="ob-sub">This shapes how your AI coach programs and communicates with you.</div>
+    <div class="ob-options" id="ob-goals">
+      <div class="ob-option" onclick="obSelect('goals',this,'performance')">
+        <div class="ob-option-icon">🏆</div>
+        <div class="ob-option-text"><div class="ob-option-label">Athletic Performance</div><div class="ob-option-desc">Get faster, stronger, more explosive</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+      <div class="ob-option" onclick="obSelect('goals',this,'strength')">
+        <div class="ob-option-icon">💪</div>
+        <div class="ob-option-text"><div class="ob-option-label">Build Strength & Muscle</div><div class="ob-option-desc">Progressive overload, hypertrophy focus</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+      <div class="ob-option" onclick="obSelect('goals',this,'fat_loss')">
+        <div class="ob-option-icon">🔥</div>
+        <div class="ob-option-text"><div class="ob-option-label">Lose Fat, Stay Lean</div><div class="ob-option-desc">Recomposition, conditioning, nutrition</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+      <div class="ob-option" onclick="obSelect('goals',this,'health')">
+        <div class="ob-option-icon">❤️</div>
+        <div class="ob-option-text"><div class="ob-option-label">General Health & Longevity</div><div class="ob-option-desc">Move well, feel great, reduce injury risk</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+    </div>
+    <button class="ob-next" id="ob-next-1" disabled onclick="obNext(2)">Continue →</button>
+  </div>
+
+  <!-- STEP 2: Level + Equipment -->
+  <div class="ob-step" id="ob-step-2" style="padding-top:calc(var(--safe-top) + 72px)">
+    <div class="ob-step-num">STEP 3 OF 5</div>
+    <div class="ob-title">Your training level & gear</div>
+    <div class="ob-sub">So I can calibrate intensity, volume, and exercise selection.</div>
+    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EXPERIENCE LEVEL</div>
+    <div class="ob-options" id="ob-level" style="flex:0;margin-bottom:20px">
+      <div class="ob-option" onclick="obSelect('level',this,'beginner')">
+        <div class="ob-option-icon">🌱</div>
+        <div class="ob-option-text"><div class="ob-option-label">Beginner</div><div class="ob-option-desc">Under 1 year consistent training</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+      <div class="ob-option" onclick="obSelect('level',this,'intermediate')">
+        <div class="ob-option-icon">⚡</div>
+        <div class="ob-option-text"><div class="ob-option-label">Intermediate</div><div class="ob-option-desc">1–4 years, solid movement patterns</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+      <div class="ob-option" onclick="obSelect('level',this,'advanced')">
+        <div class="ob-option-icon">🔥</div>
+        <div class="ob-option-text"><div class="ob-option-label">Advanced</div><div class="ob-option-desc">4+ years, training is a lifestyle</div></div>
+        <div class="ob-check">✓</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EQUIPMENT (select all)</div>
+    <div class="ob-grid" id="ob-equipment">
+      <div class="ob-option" onclick="obToggle('equipment',this,'kettlebell')"><div class="ob-option-icon">🏋️</div><div class="ob-option-label" style="font-size:13px">Kettlebells</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('equipment',this,'barbell')"><div class="ob-option-icon">🏋️</div><div class="ob-option-label" style="font-size:13px">Barbell</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('equipment',this,'dumbbells')"><div class="ob-option-icon">💪</div><div class="ob-option-label" style="font-size:13px">Dumbbells</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('equipment',this,'bodyweight')"><div class="ob-option-icon">🤸</div><div class="ob-option-label" style="font-size:13px">Bodyweight</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('equipment',this,'cardio_machines')"><div class="ob-option-icon">🏃</div><div class="ob-option-label" style="font-size:13px">Cardio Machines</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('equipment',this,'full_gym')"><div class="ob-option-icon">🏟️</div><div class="ob-option-label" style="font-size:13px">Full Gym</div><div class="ob-check">✓</div></div>
+    </div>
+    <button class="ob-next" id="ob-next-2" disabled onclick="obNext(3)">Continue →</button>
+  </div>
+
+  <!-- STEP 3: Weekly Schedule -->
+  <div class="ob-step" id="ob-step-3" style="padding-top:calc(var(--safe-top) + 72px)">
+    <div class="ob-step-num">STEP 4 OF 5</div>
+    <div class="ob-title">Build your weekly schedule</div>
+    <div class="ob-sub">Tap a day to set your training type. This drives your Today screen and AI recommendations.</div>
+    <div class="ob-day-grid" id="ob-day-grid"></div>
+    <div id="ob-day-types" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+    <button class="ob-next" onclick="obNext(4)">Continue →</button>
+  </div>
+
+  <!-- STEP 4: Diet -->
+  <div class="ob-step" id="ob-step-4" style="padding-top:calc(var(--safe-top) + 72px)">
+    <div class="ob-step-num">STEP 5 OF 5</div>
+    <div class="ob-title">Last thing — your diet</div>
+    <div class="ob-sub">Your AI coach uses this to personalize nutrition timing and meal suggestions.</div>
+    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">PROTEIN SOURCES (select all you eat)</div>
+    <div class="ob-grid" id="ob-proteins" style="margin-bottom:20px">
+      <div class="ob-option" onclick="obToggle('proteins',this,'chicken')"><div class="ob-option-icon">🍗</div><div class="ob-option-label" style="font-size:13px">Chicken</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('proteins',this,'beef')"><div class="ob-option-icon">🥩</div><div class="ob-option-label" style="font-size:13px">Beef</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('proteins',this,'fish')"><div class="ob-option-icon">🐟</div><div class="ob-option-label" style="font-size:13px">Fish</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('proteins',this,'eggs')"><div class="ob-option-icon">🥚</div><div class="ob-option-label" style="font-size:13px">Eggs</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('proteins',this,'protein_shakes')"><div class="ob-option-icon">🥤</div><div class="ob-option-label" style="font-size:13px">Protein Shakes</div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obToggle('proteins',this,'plant_based')"><div class="ob-option-icon">🌱</div><div class="ob-option-label" style="font-size:13px">Plant-Based</div><div class="ob-check">✓</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">SUPPLEMENTS (optional)</div>
+    <input class="ob-name-input" id="ob-supplements" placeholder="e.g. creatine, vitamin D, fish oil" style="font-size:15px;font-weight:400;padding:14px 16px">
+    <div style="flex:1"></div>
+    <button class="ob-next" onclick="obFinish()">Start Training 🔥</button>
+    <button class="ob-skip" onclick="obFinish()">Skip for now</button>
+  </div>
+
 </div>
 
 <!-- MAIN APP -->
@@ -363,44 +520,7 @@ let currentProfile = null;
 let chatHistory = [];
 let exerciseDone = {};
 
-const SCHEDULE = {
-  0: { type: 'recovery', label: 'Recovery', icon: '🧘', exercises: [
-    { name: 'Foam Rolling', sets: '10 min', notes: 'Full body' },
-    { name: 'Mobility Flow', sets: '15 min', notes: 'Hip + thoracic' },
-    { name: 'Breathing', sets: '5 min', notes: 'Box breathing' }
-  ]},
-  1: { type: 'soccer', label: 'Soccer', icon: '⚽', exercises: [
-    { name: 'Dynamic Warmup', sets: '10 min', notes: 'Before game' },
-    { name: 'Indoor Soccer', sets: '60-75 min', notes: 'Full intensity' },
-    { name: 'Cooldown Stretch', sets: '10 min', notes: 'Hip flexors + hamstrings' }
-  ]},
-  2: { type: 'pilates', label: 'Pilates', icon: '🤸', exercises: [
-    { name: 'Pilates Class', sets: '45-55 min', notes: 'Core focus' },
-    { name: 'Accessory Work', sets: '15 min', notes: 'Glutes + posterior chain' }
-  ]},
-  3: { type: 'kettlebell', label: 'Kettlebell', icon: '🏋️', exercises: [
-    { name: 'KB Swing', sets: '5×20', notes: 'Hip hinge, snap at top' },
-    { name: 'Turkish Get-Up', sets: '3×3 each side', notes: 'Slow and controlled' },
-    { name: 'KB Clean & Press', sets: '4×5 each', notes: 'Lat-packed overhead' },
-    { name: 'Goblet Squat', sets: '4×12', notes: 'Elbows inside knees' },
-    { name: 'KB Row', sets: '3×10 each', notes: 'Hinge and pull' }
-  ]},
-  4: { type: 'soccer', label: 'Soccer', icon: '⚽', exercises: [
-    { name: 'Dynamic Warmup', sets: '10 min', notes: 'Before game' },
-    { name: 'Indoor Soccer', sets: '60-75 min', notes: 'Full intensity' },
-    { name: 'Cooldown Stretch', sets: '10 min', notes: 'Hip flexors + hamstrings' }
-  ]},
-  5: { type: 'run', label: 'Run', icon: '🏃', exercises: [
-    { name: 'Easy Run', sets: '25-35 min', notes: 'Zone 2, conversational pace' },
-    { name: 'Strides', sets: '4×20 sec', notes: 'After easy run, relaxed' },
-    { name: 'Core Work', sets: '10 min', notes: 'Plank variations' }
-  ]},
-  6: { type: 'recovery', label: 'Recovery', icon: '😴', exercises: [
-    { name: 'Walk', sets: '20-30 min', notes: 'Easy pace' },
-    { name: 'Stretching', sets: '15 min', notes: 'Full body' },
-    { name: 'Sauna / Ice Bath', sets: 'Optional', notes: 'If available' }
-  ]}
-};
+// Schedule is now dynamic from user profile (see WORKOUT_TYPES + getUserDaySchedule)
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
@@ -467,9 +587,148 @@ function showAuth() {
 
 function showApp() {
   document.getElementById('auth-screen').classList.remove('active');
+  // Check if onboarding needed
+  if (!currentProfile?.onboarded) {
+    document.getElementById('onboarding-screen').classList.add('active');
+    document.getElementById('main-screen').classList.remove('active');
+    obInit();
+  } else {
+    document.getElementById('onboarding-screen').classList.remove('active');
+    document.getElementById('main-screen').classList.add('active');
+    initToday();
+    loadTodayMetrics();
+  }
+}
+
+// ── ONBOARDING ────────────────────────────────────────────────
+const obData = { name: '', goals: null, level: null, equipment: [], schedule: {}, proteins: [], supplements: '' };
+let obCurrentStep = 0;
+
+function obInit() {
+  obCurrentStep = 0;
+  // Build day grid for step 3
+  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const types = ['rest','strength','cardio','hiit','sport','pilates','yoga','run','recovery'];
+  const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
+
+  const grid = document.getElementById('ob-day-grid');
+  grid.innerHTML = days.map((d, i) => `
+    <div class="ob-day-btn" id="ob-day-${i}" onclick="obSelectDay(${i})">
+      <div class="ob-day-name">${d.substring(0,1)}</div>
+      <div class="ob-day-emoji" id="ob-day-emoji-${i}">😴</div>
+    </div>
+  `).join('');
+
+  const typesEl = document.getElementById('ob-day-types');
+  typesEl.innerHTML = `
+    <div id="ob-day-editor" style="display:none">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="ob-day-editing-label">Editing: Sunday</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="ob-type-btns">
+        ${types.map(t => `<div onclick="obSetDayType(this,'${t}')" data-type="${t}" style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.2s">
+          <div style="font-size:20px">${typeEmojis[t]}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;text-transform:capitalize">${t}</div>
+        </div>`).join('')}
+      </div>
+    </div>
+    <div id="ob-day-hint" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">↑ Tap a day above to set its type</div>
+  `;
+
+  obGoToStep(0);
+}
+
+function obGoToStep(step) {
+  document.querySelectorAll('.ob-step').forEach((el, i) => {
+    el.classList.toggle('active', i === step);
+  });
+  document.querySelectorAll('.ob-dot').forEach((el, i) => {
+    el.classList.toggle('done', i <= step);
+  });
+  obCurrentStep = step;
+}
+
+function obNext(step) { obGoToStep(step); }
+
+function obSelect(group, el, val) {
+  document.querySelectorAll(`#ob-${group} .ob-option`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  obData[group] = val;
+  const nextBtn = document.getElementById(`ob-next-${obCurrentStep}`);
+  if (nextBtn) nextBtn.disabled = false;
+}
+
+function obToggle(group, el, val) {
+  el.classList.toggle('selected');
+  if (!obData[group]) obData[group] = [];
+  if (el.classList.contains('selected')) {
+    if (!obData[group].includes(val)) obData[group].push(val);
+  } else {
+    obData[group] = obData[group].filter(v => v !== val);
+  }
+}
+
+let obEditingDay = null;
+const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
+const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+function obSelectDay(i) {
+  document.querySelectorAll('.ob-day-btn').forEach(b => b.style.borderColor = '');
+  document.getElementById(`ob-day-${i}`).style.borderColor = 'var(--gold)';
+  obEditingDay = i;
+  document.getElementById('ob-day-editor').style.display = 'block';
+  document.getElementById('ob-day-hint').style.display = 'none';
+  document.getElementById('ob-day-editing-label').textContent = `Editing: ${days[i]}`;
+  // Highlight current selection
+  const current = obData.schedule[i]?.type || 'rest';
+  document.querySelectorAll('#ob-type-btns [data-type]').forEach(btn => {
+    const isSelected = btn.dataset.type === current;
+    btn.style.borderColor = isSelected ? 'var(--gold)' : 'var(--border)';
+    btn.style.background = isSelected ? 'var(--gold-dim)' : 'var(--card)';
+  });
+}
+
+function obSetDayType(el, type) {
+  if (obEditingDay === null) return;
+  obData.schedule[obEditingDay] = { type };
+  document.querySelectorAll('#ob-type-btns [data-type]').forEach(btn => {
+    btn.style.borderColor = btn.dataset.type === type ? 'var(--gold)' : 'var(--border)';
+    btn.style.background = btn.dataset.type === type ? 'var(--gold-dim)' : 'var(--card)';
+  });
+  const emoji = typeEmojis[type] || '💪';
+  document.getElementById(`ob-day-emoji-${obEditingDay}`).textContent = emoji;
+  document.getElementById(`ob-day-${obEditingDay}`).classList.add('active');
+}
+
+async function obFinish() {
+  if (!currentUser) return;
+  obData.name = document.getElementById('ob-name').value.trim() || currentUser.email.split('@')[0];
+  obData.supplements = document.getElementById('ob-supplements').value.trim();
+
+  // Build schedule — fill any unset days as rest
+  const finalSchedule = {};
+  for (let i = 0; i < 7; i++) {
+    finalSchedule[i] = obData.schedule[i] || { type: 'rest' };
+  }
+
+  // Save to Supabase
+  await sb.from('profiles').update({
+    full_name: obData.name,
+    goals: obData.goals ? [obData.goals] : ['general_fitness'],
+    activity_level: obData.level || 'intermediate',
+    equipment: obData.equipment.length ? obData.equipment : ['bodyweight'],
+    schedule: finalSchedule,
+    diet_proteins: obData.proteins.length ? obData.proteins : ['chicken', 'beef'],
+    supplements: obData.supplements ? obData.supplements.split(',').map(s => s.trim()) : [],
+    onboarded: true,
+    language: navigator.language?.startsWith('es') ? 'es' : 'en'
+  }).eq('id', currentUser.id);
+
+  // Reload profile and go to app
+  await loadProfile();
+  document.getElementById('onboarding-screen').classList.remove('active');
   document.getElementById('main-screen').classList.add('active');
   initToday();
   loadTodayMetrics();
+  showToast(`Welcome, ${obData.name}! 🔥`);
 }
 
 // ── PROFILE ───────────────────────────────────────────────────
@@ -499,25 +758,50 @@ async function loadProfile() {
 // ── TODAY ─────────────────────────────────────────────────────
 function initToday() {
   const now = new Date();
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   document.getElementById('today-date').textContent =
-    `${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
-
+    `${dayNames[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
   const hour = now.getHours();
   document.getElementById('today-greeting').textContent =
     hour < 12 ? '🌅' : hour < 17 ? '☀️' : '🌙';
-
   buildWeekStrip(now);
   buildWorkout(now.getDay());
 }
 
+// Map profile schedule types to workout definitions
+const WORKOUT_TYPES = {
+  soccer:    { label:'Soccer',    icon:'⚽', exercises:[{name:'Dynamic Warmup',sets:'10 min',notes:'Before game'},{name:'Indoor Soccer',sets:'60-75 min',notes:'Full intensity'},{name:'Cooldown Stretch',sets:'10 min',notes:'Hip flexors + hamstrings'}]},
+  sport:     { label:'Sport',     icon:'⚽', exercises:[{name:'Dynamic Warmup',sets:'10 min',notes:'Before activity'},{name:'Sport Practice/Game',sets:'60-90 min',notes:'Full effort'},{name:'Cooldown',sets:'10 min',notes:'Full body stretch'}]},
+  strength:  { label:'Strength',  icon:'🏋️', exercises:[{name:'Compound Lift A',sets:'4×5',notes:'Squat / Deadlift / Press'},{name:'Accessory Push',sets:'3×10',notes:'Chest / Shoulders'},{name:'Accessory Pull',sets:'3×10',notes:'Rows / Curls'},{name:'Core',sets:'3×12',notes:'Plank / Ab work'}]},
+  kettlebell:{ label:'Kettlebell',icon:'🏋️', exercises:[{name:'KB Swing',sets:'5×20',notes:'Hip hinge, snap at top'},{name:'Turkish Get-Up',sets:'3×3 each',notes:'Slow and controlled'},{name:'KB Clean & Press',sets:'4×5 each',notes:'Lat-packed overhead'},{name:'Goblet Squat',sets:'4×12',notes:'Elbows inside knees'},{name:'KB Row',sets:'3×10 each',notes:'Hinge and pull'}]},
+  hiit:      { label:'HIIT',      icon:'⚡', exercises:[{name:'Warmup',sets:'5 min',notes:'Light cardio + mobility'},{name:'Work Intervals',sets:'8×40s on / 20s off',notes:'Max effort each round'},{name:'Active Recovery',sets:'2 min',notes:'Between rounds'},{name:'Cooldown',sets:'5 min',notes:'Light stretch'}]},
+  cardio:    { label:'Cardio',    icon:'🏃', exercises:[{name:'Warmup Walk',sets:'5 min',notes:'Easy pace'},{name:'Cardio Session',sets:'30-45 min',notes:'Zone 2 — can hold a conversation'},{name:'Cooldown',sets:'5 min',notes:'Walk + stretch'}]},
+  run:       { label:'Run',       icon:'👟', exercises:[{name:'Easy Run',sets:'25-35 min',notes:'Zone 2, conversational pace'},{name:'Strides',sets:'4×20 sec',notes:'After run, relaxed'},{name:'Core Work',sets:'10 min',notes:'Plank variations'}]},
+  pilates:   { label:'Pilates',   icon:'🤸', exercises:[{name:'Pilates Class',sets:'45-55 min',notes:'Core focus'},{name:'Accessory Work',sets:'15 min',notes:'Glutes + posterior chain'}]},
+  yoga:      { label:'Yoga',      icon:'🧘', exercises:[{name:'Yoga Flow',sets:'45-60 min',notes:'Follow a class or sequence'},{name:'Breathwork',sets:'5 min',notes:'End of session'}]},
+  recovery:  { label:'Recovery',  icon:'🧊', exercises:[{name:'Walk',sets:'20-30 min',notes:'Easy pace'},{name:'Foam Rolling',sets:'10 min',notes:'Full body'},{name:'Stretching',sets:'15 min',notes:'Hold 45-60 sec each'}]},
+  rest:      { label:'Rest Day',  icon:'😴', exercises:[{name:'Rest & Recover',sets:'All day',notes:'Sleep 8hrs, eat well, hydrate'},{name:'Optional Walk',sets:'20 min',notes:'Light movement only'}]},
+};
+
+function getUserDaySchedule(dayOfWeek) {
+  // Use profile schedule if available, else fall back to defaults
+  const profileSched = currentProfile?.schedule;
+  if (profileSched && profileSched[dayOfWeek]) {
+    const type = profileSched[dayOfWeek].type || 'rest';
+    return WORKOUT_TYPES[type] || WORKOUT_TYPES.rest;
+  }
+  // Fallback default schedule
+  const defaults = { 0:'recovery', 1:'sport', 2:'pilates', 3:'kettlebell', 4:'sport', 5:'run', 6:'rest' };
+  return WORKOUT_TYPES[defaults[dayOfWeek]] || WORKOUT_TYPES.rest;
+}
+
 function buildWeekStrip(now) {
   const strip = document.getElementById('week-strip');
-  const days = ['S','M','T','W','T','F','S'];
+  const dayLetters = ['S','M','T','W','T','F','S'];
   const today = now.getDay();
-  strip.innerHTML = days.map((d, i) => {
-    const sched = SCHEDULE[i];
+  strip.innerHTML = dayLetters.map((d, i) => {
+    const sched = getUserDaySchedule(i);
     return `<div class="day-pill ${i === today ? 'today' : ''}">
       <div class="day-name">${d}</div>
       <div class="day-type">${sched.icon}</div>
@@ -526,11 +810,10 @@ function buildWeekStrip(now) {
 }
 
 function buildWorkout(dayOfWeek) {
-  const sched = SCHEDULE[dayOfWeek];
+  const sched = getUserDaySchedule(dayOfWeek);
   document.getElementById('workout-title').textContent = sched.label;
   document.getElementById('workout-meta').textContent = `${sched.exercises.length} exercises`;
-  document.getElementById('workout-badge').textContent = sched.type.toUpperCase();
-
+  document.getElementById('workout-badge').textContent = sched.label.toUpperCase();
   const list = document.getElementById('exercise-list');
   list.innerHTML = sched.exercises.map((ex, i) => `
     <div class="exercise-row">
@@ -700,8 +983,9 @@ function switchTab(tab) {
   if (tab === 'coach' && chatHistory.length === 0) {
     setTimeout(() => {
       const today = new Date().getDay();
-      const sched = SCHEDULE[today];
-      addMessage('assistant', `Hey! Today is ${sched.label} day ${sched.icon}\n\nI'm your AI coach. Ask me anything — what to do today, how to optimize your recovery, nutrition timing, or just talk through your training. What's on your mind?`);
+      const sched = getUserDaySchedule(today);
+      const name = currentProfile?.full_name?.split(' ')[0] || 'there';
+      addMessage('assistant', `Hey ${name}! Today is ${sched.label} day ${sched.icon}\n\nI'm your AI coach. Ask me anything — what to do today, how to optimize your recovery, nutrition timing, or just talk through your training. What's on your mind?`);
     }, 300);
   }
 }

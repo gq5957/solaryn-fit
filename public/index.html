@@ -31,12 +31,8 @@
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--white); font-family: 'DM Sans', sans-serif; }
 #app { height: 100%; display: flex; flex-direction: column; }
-
-/* SCREENS */
 .screen { display: none; flex-direction: column; height: 100%; }
 .screen.active { display: flex; }
-
-/* AUTH */
 #auth-screen { background: var(--bg); align-items: center; justify-content: center; padding: 32px 24px; padding-top: calc(var(--safe-top) + 32px); }
 .brand-mark { width: 72px; height: 72px; border-radius: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 32px; }
 .brand-name { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--gold); letter-spacing: 3px; margin-bottom: 6px; }
@@ -52,38 +48,25 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .auth-toggle { margin-top: 20px; font-size: 13px; color: var(--muted); cursor: pointer; }
 .auth-toggle span { color: var(--gold); }
 .auth-error { color: var(--red); font-size: 13px; margin-top: 8px; text-align: center; min-height: 18px; }
-
-/* MAIN APP */
 #main-screen { background: var(--bg); }
 .content-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--safe-bottom) + 70px); }
 .content-area::-webkit-scrollbar { display: none; }
-
-/* NAV */
 .nav-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-top: 1px solid var(--border); display: flex; padding-bottom: var(--safe-bottom); padding-top: 8px; z-index: 100; }
 .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 4px 0; cursor: pointer; opacity: 0.4; transition: opacity 0.2s; border: none; background: none; }
 .nav-item.active { opacity: 1; }
 .nav-icon { font-size: 20px; }
 .nav-label { font-size: 10px; color: var(--gold); letter-spacing: 0.5px; font-weight: 500; }
 .nav-item:not(.active) .nav-label { color: var(--muted); }
-
-/* HEADER */
 .page-header { padding: calc(var(--safe-top) + 16px) 20px 16px; display: flex; align-items: center; justify-content: space-between; }
 .page-title { font-family: 'DM Mono', monospace; font-size: 14px; color: var(--gold); letter-spacing: 2px; font-weight: 500; }
 .page-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-/* CARDS */
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin: 0 16px 12px; }
 .card-label { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; }
 .card-gold { border-color: var(--gold-border); background: var(--gold-dim); }
-
-/* TODAY - METRICS */
 .metrics-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .metric-tile { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px; text-align: center; }
 .metric-val { font-size: 20px; font-weight: 700; color: var(--gold); font-family: 'DM Mono', monospace; }
 .metric-label { font-size: 10px; color: var(--muted); letter-spacing: 1px; margin-top: 3px; }
-.metric-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-/* TODAY - WORKOUT */
 .workout-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; margin: 0 16px 12px; overflow: hidden; }
 .workout-header { padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
 .workout-type { font-size: 15px; font-weight: 600; }
@@ -94,8 +77,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .exercise-sets { font-size: 12px; color: var(--muted); margin-top: 2px; }
 .exercise-check { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
 .exercise-check.done { background: var(--green); border-color: var(--green); }
-
-/* COACH */
 .chat-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px 16px; display: flex; flex-direction: column; gap: 12px; }
 .chat-area::-webkit-scrollbar { display: none; }
 .msg { max-width: 85%; }
@@ -121,8 +102,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .suggestions::-webkit-scrollbar { display: none; }
 .suggestion-chip { flex-shrink: 0; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 8px 14px; font-size: 12px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .suggestion-chip:active { border-color: var(--gold-border); color: var(--gold); }
-
-/* PROFILE */
 .profile-header { padding: calc(var(--safe-top) + 20px) 20px 20px; text-align: center; }
 .avatar { width: 72px; height: 72px; border-radius: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 12px; }
 .profile-name { font-size: 20px; font-weight: 700; }
@@ -135,11 +114,20 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .signout-btn { margin: 0 16px; background: none; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--red); font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; width: calc(100% - 32px); transition: border-color 0.2s; }
 .signout-btn:active { border-color: var(--red); }
 
-/* TOAST */
+/* ── DEBUG BADGE ── */
+.debug-badge { margin: 0 16px 16px; background: rgba(74,158,255,0.07); border: 1px solid rgba(74,158,255,0.2); border-radius: 12px; padding: 12px 14px; }
+.debug-title { font-size: 9px; color: var(--blue); letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; }
+.debug-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.debug-row:last-child { margin-bottom: 0; }
+.debug-key { font-size: 11px; color: var(--muted); }
+.debug-val { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; color: var(--white); }
+.debug-val.tier-free    { color: var(--muted); }
+.debug-val.tier-app     { color: var(--blue); }
+.debug-val.tier-coached { color: var(--gold); }
+.debug-val.tier-elite   { color: #A78BFA; }
+
 .toast { position: fixed; top: calc(var(--safe-top) + 16px); left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; color: var(--white); z-index: 1000; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .toast.show { opacity: 1; }
-
-/* LOADING */
 .loader { display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; gap: 16px; }
 .spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -177,9 +165,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .ob-day-name { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
 .ob-day-btn.active .ob-day-name { color: var(--gold); }
 .ob-day-emoji { font-size: 18px; margin-top: 4px; }
-.ob-type-select { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--white); font-size: 13px; font-family: 'DM Sans', sans-serif; outline: none; width: 100%; margin-top: 6px; }
-
-/* DAYS SCHEDULE */
 .days-row { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
 .day-pill { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
 .day-pill.today { background: var(--gold-dim); border-color: var(--gold-border); }
@@ -214,8 +199,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 <!-- ONBOARDING SCREEN -->
 <div id="onboarding-screen" class="screen">
-
-  <!-- Progress dots -->
   <div style="position:fixed;top:0;left:0;right:0;padding:calc(var(--safe-top) + 12px) 24px 0;z-index:10;background:var(--bg)">
     <div class="ob-progress">
       <div class="ob-dot" id="ob-dot-0"></div>
@@ -225,8 +208,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
       <div class="ob-dot" id="ob-dot-4"></div>
     </div>
   </div>
-
-  <!-- STEP 0: Name -->
   <div class="ob-step" id="ob-step-0" style="padding-top:calc(var(--safe-top) + 72px)">
     <div class="ob-step-num">STEP 1 OF 5</div>
     <div class="ob-title">What should I call you?</div>
@@ -235,59 +216,27 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     <div style="flex:1"></div>
     <button class="ob-next" id="ob-next-0" disabled onclick="obNext(1)">Continue →</button>
   </div>
-
-  <!-- STEP 1: Goal -->
   <div class="ob-step" id="ob-step-1" style="padding-top:calc(var(--safe-top) + 72px)">
     <div class="ob-step-num">STEP 2 OF 5</div>
     <div class="ob-title">What's your primary goal?</div>
     <div class="ob-sub">This shapes how your AI coach programs and communicates with you.</div>
     <div class="ob-options" id="ob-goals">
-      <div class="ob-option" onclick="obSelect('goals',this,'performance')">
-        <div class="ob-option-icon">🏆</div>
-        <div class="ob-option-text"><div class="ob-option-label">Athletic Performance</div><div class="ob-option-desc">Get faster, stronger, more explosive</div></div>
-        <div class="ob-check">✓</div>
-      </div>
-      <div class="ob-option" onclick="obSelect('goals',this,'strength')">
-        <div class="ob-option-icon">💪</div>
-        <div class="ob-option-text"><div class="ob-option-label">Build Strength & Muscle</div><div class="ob-option-desc">Progressive overload, hypertrophy focus</div></div>
-        <div class="ob-check">✓</div>
-      </div>
-      <div class="ob-option" onclick="obSelect('goals',this,'fat_loss')">
-        <div class="ob-option-icon">🔥</div>
-        <div class="ob-option-text"><div class="ob-option-label">Lose Fat, Stay Lean</div><div class="ob-option-desc">Recomposition, conditioning, nutrition</div></div>
-        <div class="ob-check">✓</div>
-      </div>
-      <div class="ob-option" onclick="obSelect('goals',this,'health')">
-        <div class="ob-option-icon">❤️</div>
-        <div class="ob-option-text"><div class="ob-option-label">General Health & Longevity</div><div class="ob-option-desc">Move well, feel great, reduce injury risk</div></div>
-        <div class="ob-check">✓</div>
-      </div>
+      <div class="ob-option" onclick="obSelect('goals',this,'performance')"><div class="ob-option-icon">🏆</div><div class="ob-option-text"><div class="ob-option-label">Athletic Performance</div><div class="ob-option-desc">Get faster, stronger, more explosive</div></div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obSelect('goals',this,'strength')"><div class="ob-option-icon">💪</div><div class="ob-option-text"><div class="ob-option-label">Build Strength & Muscle</div><div class="ob-option-desc">Progressive overload, hypertrophy focus</div></div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obSelect('goals',this,'fat_loss')"><div class="ob-option-icon">🔥</div><div class="ob-option-text"><div class="ob-option-label">Lose Fat, Stay Lean</div><div class="ob-option-desc">Recomposition, conditioning, nutrition</div></div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obSelect('goals',this,'health')"><div class="ob-option-icon">❤️</div><div class="ob-option-text"><div class="ob-option-label">General Health & Longevity</div><div class="ob-option-desc">Move well, feel great, reduce injury risk</div></div><div class="ob-check">✓</div></div>
     </div>
     <button class="ob-next" id="ob-next-1" disabled onclick="obNext(2)">Continue →</button>
   </div>
-
-  <!-- STEP 2: Level + Equipment -->
   <div class="ob-step" id="ob-step-2" style="padding-top:calc(var(--safe-top) + 72px)">
     <div class="ob-step-num">STEP 3 OF 5</div>
     <div class="ob-title">Your training level & gear</div>
     <div class="ob-sub">So I can calibrate intensity, volume, and exercise selection.</div>
     <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EXPERIENCE LEVEL</div>
     <div class="ob-options" id="ob-level" style="flex:0;margin-bottom:20px">
-      <div class="ob-option" onclick="obSelect('level',this,'beginner')">
-        <div class="ob-option-icon">🌱</div>
-        <div class="ob-option-text"><div class="ob-option-label">Beginner</div><div class="ob-option-desc">Under 1 year consistent training</div></div>
-        <div class="ob-check">✓</div>
-      </div>
-      <div class="ob-option" onclick="obSelect('level',this,'intermediate')">
-        <div class="ob-option-icon">⚡</div>
-        <div class="ob-option-text"><div class="ob-option-label">Intermediate</div><div class="ob-option-desc">1–4 years, solid movement patterns</div></div>
-        <div class="ob-check">✓</div>
-      </div>
-      <div class="ob-option" onclick="obSelect('level',this,'advanced')">
-        <div class="ob-option-icon">🔥</div>
-        <div class="ob-option-text"><div class="ob-option-label">Advanced</div><div class="ob-option-desc">4+ years, training is a lifestyle</div></div>
-        <div class="ob-check">✓</div>
-      </div>
+      <div class="ob-option" onclick="obSelect('level',this,'beginner')"><div class="ob-option-icon">🌱</div><div class="ob-option-text"><div class="ob-option-label">Beginner</div><div class="ob-option-desc">Under 1 year consistent training</div></div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obSelect('level',this,'intermediate')"><div class="ob-option-icon">⚡</div><div class="ob-option-text"><div class="ob-option-label">Intermediate</div><div class="ob-option-desc">1–4 years, solid movement patterns</div></div><div class="ob-check">✓</div></div>
+      <div class="ob-option" onclick="obSelect('level',this,'advanced')"><div class="ob-option-icon">🔥</div><div class="ob-option-text"><div class="ob-option-label">Advanced</div><div class="ob-option-desc">4+ years, training is a lifestyle</div></div><div class="ob-check">✓</div></div>
     </div>
     <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EQUIPMENT (select all)</div>
     <div class="ob-grid" id="ob-equipment">
@@ -300,8 +249,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     </div>
     <button class="ob-next" id="ob-next-2" disabled onclick="obNext(3)">Continue →</button>
   </div>
-
-  <!-- STEP 3: Weekly Schedule -->
   <div class="ob-step" id="ob-step-3" style="padding-top:calc(var(--safe-top) + 72px)">
     <div class="ob-step-num">STEP 4 OF 5</div>
     <div class="ob-title">Build your weekly schedule</div>
@@ -310,8 +257,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     <div id="ob-day-types" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
     <button class="ob-next" onclick="obNext(4)">Continue →</button>
   </div>
-
-  <!-- STEP 4: Diet -->
   <div class="ob-step" id="ob-step-4" style="padding-top:calc(var(--safe-top) + 72px)">
     <div class="ob-step-num">STEP 5 OF 5</div>
     <div class="ob-title">Last thing — your diet</div>
@@ -331,7 +276,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
     <button class="ob-next" onclick="obFinish()">Start Training 🔥</button>
     <button class="ob-skip" onclick="obFinish()">Skip for now</button>
   </div>
-
 </div>
 
 <!-- MAIN APP -->
@@ -347,35 +291,20 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         </div>
         <div style="font-size:24px" id="today-greeting">👋</div>
       </div>
-
-      <!-- Week strip -->
       <div class="card" style="margin-bottom:12px">
         <div class="card-label">THIS WEEK</div>
         <div class="days-row" id="week-strip"></div>
       </div>
-
-      <!-- HRV Card -->
       <div class="card card-gold" id="hrv-card">
         <div class="card-label">READINESS</div>
         <div class="metrics-row">
-          <div class="metric-tile">
-            <div class="metric-val" id="hrv-val">—</div>
-            <div class="metric-label">HRV ms</div>
-          </div>
-          <div class="metric-tile">
-            <div class="metric-val" id="sleep-val">—</div>
-            <div class="metric-label">SLEEP h</div>
-          </div>
-          <div class="metric-tile">
-            <div class="metric-val" id="rhr-val">—</div>
-            <div class="metric-label">RHR bpm</div>
-          </div>
+          <div class="metric-tile"><div class="metric-val" id="hrv-val">—</div><div class="metric-label">HRV ms</div></div>
+          <div class="metric-tile"><div class="metric-val" id="sleep-val">—</div><div class="metric-label">SLEEP h</div></div>
+          <div class="metric-tile"><div class="metric-val" id="rhr-val">—</div><div class="metric-label">RHR bpm</div></div>
         </div>
         <div id="readiness-msg" style="margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5"></div>
         <button onclick="logMetrics()" style="margin-top:10px;background:none;border:1px solid var(--gold-border);border-radius:8px;padding:8px 14px;color:var(--gold);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:1px">+ LOG METRICS</button>
       </div>
-
-      <!-- Today's workout -->
       <div class="workout-card" id="workout-card">
         <div class="workout-header">
           <div>
@@ -386,8 +315,6 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         </div>
         <div id="exercise-list"></div>
       </div>
-
-      <!-- Ask coach -->
       <div class="card" style="cursor:pointer" onclick="switchTab('coach')">
         <div class="card-label">AI COACH</div>
         <div style="font-size:14px;color:var(--white);line-height:1.5" id="coach-preview">Ask me anything about today's training, recovery, or nutrition →</div>
@@ -427,6 +354,31 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="avatar">⚡</div>
         <div class="profile-name" id="profile-name">Loading...</div>
         <div class="profile-tier" id="profile-tier">FREE TIER</div>
+      </div>
+
+      <!-- DEBUG BADGE -->
+      <div class="debug-badge">
+        <div class="debug-title">🔬 TESTING INFO</div>
+        <div class="debug-row">
+          <span class="debug-key">Tier</span>
+          <span class="debug-val tier-free" id="debug-tier">—</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-key">AI Model</span>
+          <span class="debug-val" id="debug-model">—</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-key">Override Active</span>
+          <span class="debug-val" id="debug-override">—</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-key">Onboarded</span>
+          <span class="debug-val" id="debug-onboarded">—</span>
+        </div>
+        <div class="debug-row">
+          <span class="debug-key">User ID</span>
+          <span class="debug-val" id="debug-uid" style="font-size:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
+        </div>
       </div>
 
       <div class="settings-group">
@@ -520,7 +472,13 @@ let currentProfile = null;
 let chatHistory = [];
 let exerciseDone = {};
 
-// Schedule is now dynamic from user profile (see WORKOUT_TYPES + getUserDaySchedule)
+// ── TIER → MODEL MAP ──────────────────────────────────────────
+const TIER_INFO = {
+  free:    { label:'FREE',    model:'Claude Haiku 4.5',                  cssClass:'tier-free'    },
+  app:     { label:'APP',     model:'Claude Haiku 4.5',                  cssClass:'tier-app'     },
+  coached: { label:'COACHED', model:'Claude Sonnet 4.6',                 cssClass:'tier-coached' },
+  elite:   { label:'ELITE',   model:'Sonnet 4.6 + Opus analysis',        cssClass:'tier-elite'   },
+};
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
@@ -573,12 +531,14 @@ async function signUp() {
   if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
   const { error } = await sb.auth.signUp({ email, password: pass });
   if (error) errEl.textContent = error.message;
-  else { currentUser = null; showToast("Account created! Signing you in..."); const { error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass }); if (signInErr) errEl.textContent = signInErr.message; };
+  else {
+    showToast("Account created! Signing you in...");
+    const { error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass });
+    if (signInErr) errEl.textContent = signInErr.message;
+  }
 }
 
-async function signOut() {
-  await sb.auth.signOut();
-}
+async function signOut() { await sb.auth.signOut(); }
 
 function showAuth() {
   document.getElementById('auth-screen').classList.add('active');
@@ -587,7 +547,6 @@ function showAuth() {
 
 function showApp() {
   document.getElementById('auth-screen').classList.remove('active');
-  // Check if onboarding needed
   if (!currentProfile?.onboarded) {
     document.getElementById('onboarding-screen').classList.add('active');
     document.getElementById('main-screen').classList.remove('active');
@@ -606,15 +565,14 @@ let obCurrentStep = 0;
 
 function obInit() {
   obCurrentStep = 0;
-  // Build day grid for step 3
-  const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const dayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const types = ['rest','strength','cardio','hiit','sport','pilates','yoga','run','recovery'];
   const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
 
   const grid = document.getElementById('ob-day-grid');
-  grid.innerHTML = days.map((d, i) => `
+  grid.innerHTML = dayLabels.map((d, i) => `
     <div class="ob-day-btn" id="ob-day-${i}" onclick="obSelectDay(${i})">
-      <div class="ob-day-name">${d.substring(0,1)}</div>
+      <div class="ob-day-name">${d[0]}</div>
       <div class="ob-day-emoji" id="ob-day-emoji-${i}">😴</div>
     </div>
   `).join('');
@@ -632,17 +590,12 @@ function obInit() {
     </div>
     <div id="ob-day-hint" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">↑ Tap a day above to set its type</div>
   `;
-
   obGoToStep(0);
 }
 
 function obGoToStep(step) {
-  document.querySelectorAll('.ob-step').forEach((el, i) => {
-    el.classList.toggle('active', i === step);
-  });
-  document.querySelectorAll('.ob-dot').forEach((el, i) => {
-    el.classList.toggle('done', i <= step);
-  });
+  document.querySelectorAll('.ob-step').forEach((el, i) => el.classList.toggle('active', i === step));
+  document.querySelectorAll('.ob-dot').forEach((el, i) => el.classList.toggle('done', i <= step));
   obCurrentStep = step;
 }
 
@@ -659,16 +612,13 @@ function obSelect(group, el, val) {
 function obToggle(group, el, val) {
   el.classList.toggle('selected');
   if (!obData[group]) obData[group] = [];
-  if (el.classList.contains('selected')) {
-    if (!obData[group].includes(val)) obData[group].push(val);
-  } else {
-    obData[group] = obData[group].filter(v => v !== val);
-  }
+  if (el.classList.contains('selected')) { if (!obData[group].includes(val)) obData[group].push(val); }
+  else { obData[group] = obData[group].filter(v => v !== val); }
 }
 
 let obEditingDay = null;
 const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
-const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 function obSelectDay(i) {
   document.querySelectorAll('.ob-day-btn').forEach(b => b.style.borderColor = '');
@@ -676,13 +626,12 @@ function obSelectDay(i) {
   obEditingDay = i;
   document.getElementById('ob-day-editor').style.display = 'block';
   document.getElementById('ob-day-hint').style.display = 'none';
-  document.getElementById('ob-day-editing-label').textContent = `Editing: ${days[i]}`;
-  // Highlight current selection
+  document.getElementById('ob-day-editing-label').textContent = `Editing: ${dayNames[i]}`;
   const current = obData.schedule[i]?.type || 'rest';
   document.querySelectorAll('#ob-type-btns [data-type]').forEach(btn => {
-    const isSelected = btn.dataset.type === current;
-    btn.style.borderColor = isSelected ? 'var(--gold)' : 'var(--border)';
-    btn.style.background = isSelected ? 'var(--gold-dim)' : 'var(--card)';
+    const sel = btn.dataset.type === current;
+    btn.style.borderColor = sel ? 'var(--gold)' : 'var(--border)';
+    btn.style.background = sel ? 'var(--gold-dim)' : 'var(--card)';
   });
 }
 
@@ -693,8 +642,7 @@ function obSetDayType(el, type) {
     btn.style.borderColor = btn.dataset.type === type ? 'var(--gold)' : 'var(--border)';
     btn.style.background = btn.dataset.type === type ? 'var(--gold-dim)' : 'var(--card)';
   });
-  const emoji = typeEmojis[type] || '💪';
-  document.getElementById(`ob-day-emoji-${obEditingDay}`).textContent = emoji;
+  document.getElementById(`ob-day-emoji-${obEditingDay}`).textContent = typeEmojis[type] || '💪';
   document.getElementById(`ob-day-${obEditingDay}`).classList.add('active');
 }
 
@@ -702,14 +650,9 @@ async function obFinish() {
   if (!currentUser) return;
   obData.name = document.getElementById('ob-name').value.trim() || currentUser.email.split('@')[0];
   obData.supplements = document.getElementById('ob-supplements').value.trim();
-
-  // Build schedule — fill any unset days as rest
   const finalSchedule = {};
-  for (let i = 0; i < 7; i++) {
-    finalSchedule[i] = obData.schedule[i] || { type: 'rest' };
-  }
+  for (let i = 0; i < 7; i++) finalSchedule[i] = obData.schedule[i] || { type: 'rest' };
 
-  // Save to Supabase
   await sb.from('profiles').update({
     full_name: obData.name,
     goals: obData.goals ? [obData.goals] : ['general_fitness'],
@@ -722,7 +665,6 @@ async function obFinish() {
     language: navigator.language?.startsWith('es') ? 'es' : 'en'
   }).eq('id', currentUser.id);
 
-  // Reload profile and go to app
   await loadProfile();
   document.getElementById('onboarding-screen').classList.remove('active');
   document.getElementById('main-screen').classList.add('active');
@@ -736,40 +678,55 @@ async function loadProfile() {
   if (!currentUser) return;
   const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
+
+  // Determine effective tier (override takes priority)
+  let overrideActive = false;
+  let overrideTierName = null;
+  let effectiveTier = data?.subscription_tier?.toLowerCase() || 'free';
+
+  const { data: override } = await sb.rpc('get_access_override', {
+    p_user_id: currentUser.id, p_email: currentUser.email
+  });
+  if (override?.length) {
+    overrideActive = true;
+    overrideTierName = override[0].tier;
+    effectiveTier = override[0].tier.toLowerCase();
+  }
+
+  const tierInfo = TIER_INFO[effectiveTier] || TIER_INFO.free;
+
   if (data) {
     document.getElementById('profile-name').textContent = data.full_name || data.email?.split('@')[0] || 'Athlete';
     document.getElementById('profile-email').textContent = data.email || currentUser.email;
-    const tier = data.subscription_tier?.toUpperCase() || 'FREE';
-    document.getElementById('profile-tier').textContent = tier + ' TIER';
+    document.getElementById('profile-tier').textContent = tierInfo.label + (overrideActive ? ' ✦' : '') + ' TIER';
     document.getElementById('coach-tier-label').textContent =
-      (tier === 'ELITE' || tier === 'COACHED') ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
+      (effectiveTier === 'elite' || effectiveTier === 'coached')
+        ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
 
-    // Check access override
-    const { data: override } = await sb.rpc('get_access_override', {
-      p_user_id: currentUser.id, p_email: currentUser.email
-    });
-    if (override?.length) {
-      const t = override[0].tier.toUpperCase();
-      document.getElementById('profile-tier').textContent = t + ' TIER ✦';
-    }
+    // Debug badge
+    const dbgTier = document.getElementById('debug-tier');
+    dbgTier.textContent = tierInfo.label;
+    dbgTier.className = `debug-val ${tierInfo.cssClass}`;
+    document.getElementById('debug-model').textContent = tierInfo.model;
+    document.getElementById('debug-override').textContent = overrideActive
+      ? `✓ Yes — ${overrideTierName}` : '✗ No';
+    document.getElementById('debug-onboarded').textContent = data.onboarded ? '✓ Yes' : '✗ No';
+    document.getElementById('debug-uid').textContent = currentUser.id;
   }
 }
 
 // ── TODAY ─────────────────────────────────────────────────────
 function initToday() {
   const now = new Date();
-  const dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  document.getElementById('today-date').textContent =
-    `${dayNames[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}`;
-  const hour = now.getHours();
-  document.getElementById('today-greeting').textContent =
-    hour < 12 ? '🌅' : hour < 17 ? '☀️' : '🌙';
+  const dn = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  const mn = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('today-date').textContent = `${dn[now.getDay()]}, ${mn[now.getMonth()]} ${now.getDate()}`;
+  const h = now.getHours();
+  document.getElementById('today-greeting').textContent = h < 12 ? '🌅' : h < 17 ? '☀️' : '🌙';
   buildWeekStrip(now);
   buildWorkout(now.getDay());
 }
 
-// Map profile schedule types to workout definitions
 const WORKOUT_TYPES = {
   soccer:    { label:'Soccer',    icon:'⚽', exercises:[{name:'Dynamic Warmup',sets:'10 min',notes:'Before game'},{name:'Indoor Soccer',sets:'60-75 min',notes:'Full intensity'},{name:'Cooldown Stretch',sets:'10 min',notes:'Hip flexors + hamstrings'}]},
   sport:     { label:'Sport',     icon:'⚽', exercises:[{name:'Dynamic Warmup',sets:'10 min',notes:'Before activity'},{name:'Sport Practice/Game',sets:'60-90 min',notes:'Full effort'},{name:'Cooldown',sets:'10 min',notes:'Full body stretch'}]},
@@ -785,47 +742,32 @@ const WORKOUT_TYPES = {
 };
 
 function getUserDaySchedule(dayOfWeek) {
-  // Use profile schedule if available, else fall back to defaults
-  const profileSched = currentProfile?.schedule;
-  if (profileSched && profileSched[dayOfWeek]) {
-    const type = profileSched[dayOfWeek].type || 'rest';
-    return WORKOUT_TYPES[type] || WORKOUT_TYPES.rest;
-  }
-  // Fallback default schedule
+  const ps = currentProfile?.schedule;
+  if (ps && ps[dayOfWeek]) return WORKOUT_TYPES[ps[dayOfWeek].type] || WORKOUT_TYPES.rest;
   const defaults = { 0:'recovery', 1:'sport', 2:'pilates', 3:'kettlebell', 4:'sport', 5:'run', 6:'rest' };
   return WORKOUT_TYPES[defaults[dayOfWeek]] || WORKOUT_TYPES.rest;
 }
 
 function buildWeekStrip(now) {
   const strip = document.getElementById('week-strip');
-  const dayLetters = ['S','M','T','W','T','F','S'];
+  const dl = ['S','M','T','W','T','F','S'];
   const today = now.getDay();
-  strip.innerHTML = dayLetters.map((d, i) => {
-    const sched = getUserDaySchedule(i);
-    return `<div class="day-pill ${i === today ? 'today' : ''}">
-      <div class="day-name">${d}</div>
-      <div class="day-type">${sched.icon}</div>
-    </div>`;
+  strip.innerHTML = dl.map((d, i) => {
+    const s = getUserDaySchedule(i);
+    return `<div class="day-pill ${i === today ? 'today' : ''}"><div class="day-name">${d}</div><div class="day-type">${s.icon}</div></div>`;
   }).join('');
 }
 
 function buildWorkout(dayOfWeek) {
-  const sched = getUserDaySchedule(dayOfWeek);
-  document.getElementById('workout-title').textContent = sched.label;
-  document.getElementById('workout-meta').textContent = `${sched.exercises.length} exercises`;
-  document.getElementById('workout-badge').textContent = sched.label.toUpperCase();
-  const list = document.getElementById('exercise-list');
-  list.innerHTML = sched.exercises.map((ex, i) => `
+  const s = getUserDaySchedule(dayOfWeek);
+  document.getElementById('workout-title').textContent = s.label;
+  document.getElementById('workout-meta').textContent = `${s.exercises.length} exercises`;
+  document.getElementById('workout-badge').textContent = s.label.toUpperCase();
+  document.getElementById('exercise-list').innerHTML = s.exercises.map((ex, i) => `
     <div class="exercise-row">
-      <div>
-        <div class="exercise-name">${ex.name}</div>
-        <div class="exercise-sets">${ex.sets} · ${ex.notes}</div>
-      </div>
-      <div class="exercise-check ${exerciseDone[i] ? 'done' : ''}" onclick="toggleExercise(${i}, this)">
-        ${exerciseDone[i] ? '✓' : ''}
-      </div>
-    </div>
-  `).join('');
+      <div><div class="exercise-name">${ex.name}</div><div class="exercise-sets">${ex.sets} · ${ex.notes}</div></div>
+      <div class="exercise-check ${exerciseDone[i] ? 'done' : ''}" onclick="toggleExercise(${i}, this)">${exerciseDone[i] ? '✓' : ''}</div>
+    </div>`).join('');
 }
 
 function toggleExercise(i, el) {
@@ -837,9 +779,7 @@ function toggleExercise(i, el) {
 async function loadTodayMetrics() {
   if (!currentUser) return;
   const today = new Date().toISOString().split('T')[0];
-  const { data } = await sb.from('health_syncs')
-    .select('*').eq('user_id', currentUser.id).eq('synced_date', today).single();
-
+  const { data } = await sb.from('health_syncs').select('*').eq('user_id', currentUser.id).eq('synced_date', today).single();
   if (data) {
     if (data.hrv_ms) {
       document.getElementById('hrv-val').textContent = data.hrv_ms;
@@ -855,12 +795,8 @@ async function loadTodayMetrics() {
 }
 
 // ── METRICS MODAL ─────────────────────────────────────────────
-function logMetrics() {
-  document.getElementById('metrics-modal').style.display = 'flex';
-}
-function closeMetrics() {
-  document.getElementById('metrics-modal').style.display = 'none';
-}
+function logMetrics() { document.getElementById('metrics-modal').style.display = 'flex'; }
+function closeMetrics() { document.getElementById('metrics-modal').style.display = 'none'; }
 async function saveMetrics() {
   if (!currentUser) return;
   const hrv = parseFloat(document.getElementById('log-hrv').value) || null;
@@ -868,60 +804,34 @@ async function saveMetrics() {
   const rhr = parseInt(document.getElementById('log-rhr').value) || null;
   const weight = parseFloat(document.getElementById('log-weight').value) || null;
   const today = new Date().toISOString().split('T')[0];
-
-  await sb.from('health_syncs').upsert({
-    user_id: currentUser.id,
-    synced_date: today,
-    hrv_ms: hrv, sleep_hrs: sleep, resting_hr: rhr, weight_lbs: weight
-  }, { onConflict: 'user_id,synced_date' });
-
+  await sb.from('health_syncs').upsert({ user_id: currentUser.id, synced_date: today, hrv_ms: hrv, sleep_hrs: sleep, resting_hr: rhr, weight_lbs: weight }, { onConflict: 'user_id,synced_date' });
   closeMetrics();
   loadTodayMetrics();
   showToast('Metrics saved ✓');
 }
 
 // ── CHAT ──────────────────────────────────────────────────────
-function sendSuggestion(el) {
-  document.getElementById('chat-input').value = el.textContent;
-  sendMessage();
-}
-
-function handleChatKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-}
+function sendSuggestion(el) { document.getElementById('chat-input').value = el.textContent; sendMessage(); }
+function handleChatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 
 async function sendMessage() {
   const input = document.getElementById('chat-input');
   const text = input.value.trim();
   if (!text) return;
-
-  input.value = '';
-  input.style.height = '44px';
-
+  input.value = ''; input.style.height = '44px';
   addMessage('user', text);
   chatHistory.push({ role: 'user', content: text });
-
   const typing = addTyping();
-
   try {
     const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: chatHistory,
-        user_id: currentUser?.id
-      })
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory, user_id: currentUser?.id })
     });
     const data = await res.json();
-    const reply = data.content || 'Sorry, something went wrong.';
     typing.remove();
-    addMessage('assistant', reply);
-    chatHistory.push({ role: 'assistant', content: reply });
+    addMessage('assistant', data.content || 'Sorry, something went wrong.');
+    chatHistory.push({ role: 'assistant', content: data.content });
   } catch (e) {
     typing.remove();
     addMessage('assistant', 'Connection error. Check your internet and try again.');
@@ -933,10 +843,7 @@ function addMessage(role, text) {
   const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const div = document.createElement('div');
   div.className = `msg ${role}`;
-  div.innerHTML = `
-    <div class="msg-bubble">${text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')}</div>
-    <div class="msg-time">${now}</div>
-  `;
+  div.innerHTML = `<div class="msg-bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div class="msg-time">${now}</div>`;
   area.appendChild(div);
   area.scrollTop = area.scrollHeight;
   return div;
@@ -958,11 +865,7 @@ async function redeemCode() {
   const result = document.getElementById('invite-result');
   if (!code) return;
   if (!currentUser) { result.style.color = 'var(--red)'; result.textContent = 'Sign in first'; return; }
-
-  const { data, error } = await sb.rpc('redeem_invite_code', {
-    p_code: code, p_user_id: currentUser.id
-  });
-
+  const { data, error } = await sb.rpc('redeem_invite_code', { p_code: code, p_user_id: currentUser.id });
   if (error || !data?.success) {
     result.style.color = 'var(--red)';
     result.textContent = data?.error || 'Invalid code';
@@ -982,8 +885,7 @@ function switchTab(tab) {
   });
   if (tab === 'coach' && chatHistory.length === 0) {
     setTimeout(() => {
-      const today = new Date().getDay();
-      const sched = getUserDaySchedule(today);
+      const sched = getUserDaySchedule(new Date().getDay());
       const name = currentProfile?.full_name?.split(' ')[0] || 'there';
       addMessage('assistant', `Hey ${name}! Today is ${sched.label} day ${sched.icon}\n\nI'm your AI coach. Ask me anything — what to do today, how to optimize your recovery, nutrition timing, or just talk through your training. What's on your mind?`);
     }, 300);

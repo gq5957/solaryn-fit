@@ -21,10 +21,10 @@
   --gold-border: rgba(201,168,76,0.3);
   --white: #F0EFE8;
   --muted: #6B6A7A;
-  --dim: #2A2A38;
   --green: #2ECC71;
   --blue: #4A9EFF;
   --red: #E74C3C;
+  --purple: #A78BFA;
   --safe-top: env(safe-area-inset-top, 44px);
   --safe-bottom: env(safe-area-inset-bottom, 34px);
 }
@@ -33,6 +33,8 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 #app { height: 100%; display: flex; flex-direction: column; }
 .screen { display: none; flex-direction: column; height: 100%; }
 .screen.active { display: flex; }
+
+/* ── AUTH ── */
 #auth-screen { background: var(--bg); align-items: center; justify-content: center; padding: 32px 24px; padding-top: calc(var(--safe-top) + 32px); }
 .brand-mark { width: 72px; height: 72px; border-radius: 20px; background: var(--gold-dim); border: 1px solid var(--gold-border); display: flex; align-items: center; justify-content: center; margin-bottom: 24px; font-size: 32px; }
 .brand-name { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--gold); letter-spacing: 3px; margin-bottom: 6px; }
@@ -48,6 +50,96 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .auth-toggle { margin-top: 20px; font-size: 13px; color: var(--muted); cursor: pointer; }
 .auth-toggle span { color: var(--gold); }
 .auth-error { color: var(--red); font-size: 13px; margin-top: 8px; text-align: center; min-height: 18px; }
+
+/* ── ONBOARDING: LOGISTICS (ACT 1) ── */
+#onboarding-screen { background: var(--bg); }
+.ob-step { display: none; flex-direction: column; height: 100%; padding: calc(var(--safe-top) + 24px) 24px 40px; overflow-y: auto; }
+.ob-step.active { display: flex; }
+.ob-step::-webkit-scrollbar { display: none; }
+.ob-header { margin-bottom: 28px; }
+.ob-act { font-size: 10px; color: var(--muted); letter-spacing: 2px; font-weight: 700; margin-bottom: 6px; }
+.ob-title { font-size: 24px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
+.ob-sub { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.ob-section-label { font-size: 10px; color: var(--gold); letter-spacing: 2px; font-weight: 700; margin: 20px 0 10px; }
+.ob-name-input { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px; color: var(--white); font-size: 22px; font-weight: 600; font-family: 'DM Sans', sans-serif; outline: none; width: 100%; transition: border-color 0.2s; }
+.ob-name-input:focus { border-color: var(--gold-border); }
+.ob-next { background: var(--gold); border: none; border-radius: 14px; padding: 18px; color: #0A0A0F; font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 24px; transition: opacity 0.2s; letter-spacing: 0.5px; width: 100%; }
+.ob-next:active { opacity: 0.8; }
+.ob-next:disabled { opacity: 0.3; cursor: default; }
+.ob-day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 12px; }
+.ob-day-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.ob-day-btn.active { border-color: var(--gold); background: var(--gold-dim); }
+.ob-day-letter { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
+.ob-day-btn.active .ob-day-letter { color: var(--gold); }
+.ob-day-emoji { font-size: 16px; margin-top: 3px; }
+.ob-type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.ob-type-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; transition: all 0.2s; }
+.ob-type-btn.selected { border-color: var(--gold); background: var(--gold-dim); }
+.ob-type-emoji { font-size: 18px; }
+.ob-type-label { font-size: 10px; color: var(--muted); margin-top: 3px; text-transform: capitalize; }
+.ob-type-btn.selected .ob-type-label { color: var(--gold); }
+.ob-equip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.ob-equip-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 10px; }
+.ob-equip-btn.selected { border-color: var(--gold); background: var(--gold-dim); }
+.ob-equip-icon { font-size: 20px; }
+.ob-equip-label { font-size: 13px; font-weight: 500; }
+.ob-day-editor { margin-top: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; display: none; }
+.ob-day-editor.visible { display: block; }
+.ob-day-editing { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+/* ── INTAKE CONVERSATION (ACT 2) ── */
+#intake-screen { background: var(--bg); display: none; flex-direction: column; height: 100%; }
+#intake-screen.active { display: flex; }
+.intake-header { padding: calc(var(--safe-top) + 16px) 20px 12px; border-bottom: 1px solid var(--border); }
+.intake-title { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--gold); letter-spacing: 2px; font-weight: 500; }
+.intake-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.intake-progress { height: 2px; background: var(--border); margin-top: 12px; border-radius: 2px; }
+.intake-progress-bar { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s ease; width: 0%; }
+.intake-chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; -webkit-overflow-scrolling: touch; }
+.intake-chat::-webkit-scrollbar { display: none; }
+.intake-msg { max-width: 88%; }
+.intake-msg.ai { align-self: flex-start; }
+.intake-msg.user { align-self: flex-end; }
+.intake-bubble { padding: 13px 16px; border-radius: 18px; font-size: 14px; line-height: 1.6; }
+.intake-msg.ai .intake-bubble { background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 4px; color: var(--white); }
+.intake-msg.user .intake-bubble { background: var(--gold); color: #0A0A0F; border-bottom-right-radius: 4px; font-weight: 500; }
+.intake-input-row { padding: 12px 16px; padding-bottom: calc(var(--safe-bottom) + 12px); background: var(--surface); border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-end; }
+#intake-input { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; color: var(--white); font-size: 15px; font-family: 'DM Sans', sans-serif; outline: none; resize: none; max-height: 120px; min-height: 44px; line-height: 1.4; }
+#intake-input:focus { border-color: var(--gold-border); }
+.intake-send { width: 44px; height: 44px; border-radius: 12px; background: var(--gold); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: opacity 0.2s; }
+.intake-send:active { opacity: 0.7; }
+.intake-send svg { width: 18px; height: 18px; fill: #0A0A0F; }
+.intake-typing { display: flex; gap: 4px; padding: 13px 16px; }
+.intake-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: tdot 1.2s infinite; }
+.intake-dot:nth-child(2) { animation-delay: 0.2s; }
+.intake-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes tdot { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
+
+/* ── FILE UPLOAD (ACT 3) ── */
+#upload-screen { background: var(--bg); display: none; flex-direction: column; height: 100%; }
+#upload-screen.active { display: flex; }
+.upload-content { flex: 1; overflow-y: auto; padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 24px); -webkit-overflow-scrolling: touch; }
+.upload-content::-webkit-scrollbar { display: none; }
+.upload-zone { border: 2px dashed var(--border); border-radius: 16px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
+.upload-zone:active, .upload-zone.dragover { border-color: var(--gold); background: var(--gold-dim); }
+.upload-zone-icon { font-size: 36px; margin-bottom: 12px; }
+.upload-zone-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.upload-zone-sub { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.upload-types { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-top: 12px; }
+.upload-type-tag { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--muted); }
+.uploaded-files { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.uploaded-file { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; }
+.uploaded-file-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.uploaded-file-name { font-size: 13px; font-weight: 600; }
+.uploaded-file-status { font-size: 11px; }
+.uploaded-file-status.processing { color: var(--gold); }
+.uploaded-file-status.done { color: var(--green); }
+.uploaded-file-status.error { color: var(--red); }
+.uploaded-file-summary { font-size: 12px; color: var(--muted); line-height: 1.5; max-height: 80px; overflow: hidden; position: relative; }
+.uploaded-file-summary::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 24px; background: linear-gradient(transparent, var(--card)); }
+.skip-upload { background: none; border: none; color: var(--muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 12px; text-align: center; width: 100%; }
+
+/* ── MAIN APP ── */
 #main-screen { background: var(--bg); }
 .content-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: calc(var(--safe-bottom) + 70px); }
 .content-area::-webkit-scrollbar { display: none; }
@@ -113,58 +205,18 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .settings-row-val { font-size: 13px; color: var(--muted); }
 .signout-btn { margin: 0 16px; background: none; border: 1px solid var(--border); border-radius: 12px; padding: 14px; color: var(--red); font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; cursor: pointer; width: calc(100% - 32px); transition: border-color 0.2s; }
 .signout-btn:active { border-color: var(--red); }
-
-/* ── DEBUG BADGE ── */
 .debug-badge { margin: 0 16px 16px; background: rgba(74,158,255,0.07); border: 1px solid rgba(74,158,255,0.2); border-radius: 12px; padding: 12px 14px; }
 .debug-title { font-size: 9px; color: var(--blue); letter-spacing: 2px; font-weight: 700; margin-bottom: 10px; }
 .debug-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .debug-row:last-child { margin-bottom: 0; }
 .debug-key { font-size: 11px; color: var(--muted); }
 .debug-val { font-size: 11px; font-family: 'DM Mono', monospace; font-weight: 500; color: var(--white); }
-.debug-val.tier-free    { color: var(--muted); }
-.debug-val.tier-app     { color: var(--blue); }
+.debug-val.tier-free { color: var(--muted); }
+.debug-val.tier-app { color: var(--blue); }
 .debug-val.tier-coached { color: var(--gold); }
-.debug-val.tier-elite   { color: #A78BFA; }
-
+.debug-val.tier-elite { color: var(--purple); }
 .toast { position: fixed; top: calc(var(--safe-top) + 16px); left: 50%; transform: translateX(-50%); background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-size: 13px; color: var(--white); z-index: 1000; white-space: nowrap; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .toast.show { opacity: 1; }
-.loader { display: flex; align-items: center; justify-content: center; height: 100%; flex-direction: column; gap: 16px; }
-.spinner { width: 32px; height: 32px; border: 2px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-
-/* ONBOARDING */
-#onboarding-screen { background: var(--bg); padding: 0; }
-.ob-step { display: none; flex-direction: column; height: 100%; padding: calc(var(--safe-top) + 24px) 24px 40px; }
-.ob-step.active { display: flex; }
-.ob-progress { display: flex; gap: 6px; margin-bottom: 32px; }
-.ob-dot { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background 0.3s; }
-.ob-dot.done { background: var(--gold); }
-.ob-step-num { font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-bottom: 8px; }
-.ob-title { font-size: 26px; font-weight: 700; line-height: 1.2; margin-bottom: 8px; }
-.ob-sub { font-size: 14px; color: var(--muted); line-height: 1.5; margin-bottom: 32px; }
-.ob-options { display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.ob-option { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 14px; }
-.ob-option.selected { border-color: var(--gold); background: var(--gold-dim); }
-.ob-option-icon { font-size: 24px; width: 36px; text-align: center; }
-.ob-option-text { flex: 1; }
-.ob-option-label { font-size: 15px; font-weight: 600; }
-.ob-option-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.ob-check { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
-.ob-option.selected .ob-check { background: var(--gold); border-color: var(--gold); color: #0A0A0F; }
-.ob-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; flex: 1; }
-.ob-grid .ob-option { flex-direction: column; align-items: flex-start; gap: 8px; padding: 14px; }
-.ob-next { background: var(--gold); border: none; border-radius: 14px; padding: 18px; color: #0A0A0F; font-size: 16px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-top: 20px; transition: opacity 0.2s; letter-spacing: 0.5px; }
-.ob-next:active { opacity: 0.8; }
-.ob-next:disabled { opacity: 0.3; cursor: default; }
-.ob-skip { background: none; border: none; color: var(--muted); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; padding: 12px; margin-top: 4px; }
-.ob-name-input { background: var(--card); border: 1.5px solid var(--border); border-radius: 14px; padding: 18px; color: var(--white); font-size: 22px; font-weight: 600; font-family: 'DM Sans', sans-serif; outline: none; width: 100%; transition: border-color 0.2s; }
-.ob-name-input:focus { border-color: var(--gold-border); }
-.ob-day-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 16px; }
-.ob-day-btn { background: var(--card); border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 4px; text-align: center; cursor: pointer; transition: all 0.2s; }
-.ob-day-btn.active { border-color: var(--gold); background: var(--gold-dim); }
-.ob-day-name { font-size: 10px; color: var(--muted); letter-spacing: 1px; }
-.ob-day-btn.active .ob-day-name { color: var(--gold); }
-.ob-day-emoji { font-size: 18px; margin-top: 4px; }
 .days-row { display: flex; gap: 6px; justify-content: center; margin: 4px 0; }
 .day-pill { flex: 1; text-align: center; padding: 8px 4px; border-radius: 8px; background: var(--surface); border: 1px solid var(--border); }
 .day-pill.today { background: var(--gold-dim); border-color: var(--gold-border); }
@@ -176,7 +228,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 <body>
 <div id="app">
 
-<!-- AUTH SCREEN -->
+<!-- ── AUTH ── -->
 <div id="auth-screen" class="screen active">
   <div class="brand-mark">☀️</div>
   <div class="brand-name">SOLARYN</div>
@@ -197,93 +249,112 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   </div>
 </div>
 
-<!-- ONBOARDING SCREEN -->
+<!-- ── ONBOARDING: ACT 1 — LOGISTICS ── -->
 <div id="onboarding-screen" class="screen">
-  <div style="position:fixed;top:0;left:0;right:0;padding:calc(var(--safe-top) + 12px) 24px 0;z-index:10;background:var(--bg)">
-    <div class="ob-progress">
-      <div class="ob-dot" id="ob-dot-0"></div>
-      <div class="ob-dot" id="ob-dot-1"></div>
-      <div class="ob-dot" id="ob-dot-2"></div>
-      <div class="ob-dot" id="ob-dot-3"></div>
-      <div class="ob-dot" id="ob-dot-4"></div>
+
+  <!-- Step 0: Name -->
+  <div class="ob-step" id="ob-step-0">
+    <div class="ob-header">
+      <div class="ob-act">STEP 1 OF 2 · BASICS</div>
+      <div class="ob-title">Let's start with the basics.</div>
+      <div class="ob-sub">Quick logistics so the app knows how to show up for you. Then we'll get into what actually matters.</div>
     </div>
-  </div>
-  <div class="ob-step" id="ob-step-0" style="padding-top:calc(var(--safe-top) + 72px)">
-    <div class="ob-step-num">STEP 1 OF 5</div>
-    <div class="ob-title">What should I call you?</div>
-    <div class="ob-sub">Your AI coach will use this to personalize every interaction.</div>
-    <input class="ob-name-input" id="ob-name" placeholder="Your first name" autocomplete="given-name" oninput="document.getElementById('ob-next-0').disabled = !this.value.trim()">
+    <div class="ob-section-label">YOUR NAME</div>
+    <input class="ob-name-input" id="ob-name" placeholder="First name" autocomplete="given-name"
+      oninput="document.getElementById('ob-next-0').disabled = !this.value.trim()">
     <div style="flex:1"></div>
-    <button class="ob-next" id="ob-next-0" disabled onclick="obNext(1)">Continue →</button>
+    <button class="ob-next" id="ob-next-0" disabled onclick="obGoTo(1)">Continue →</button>
   </div>
-  <div class="ob-step" id="ob-step-1" style="padding-top:calc(var(--safe-top) + 72px)">
-    <div class="ob-step-num">STEP 2 OF 5</div>
-    <div class="ob-title">What's your primary goal?</div>
-    <div class="ob-sub">This shapes how your AI coach programs and communicates with you.</div>
-    <div class="ob-options" id="ob-goals">
-      <div class="ob-option" onclick="obSelect('goals',this,'performance')"><div class="ob-option-icon">🏆</div><div class="ob-option-text"><div class="ob-option-label">Athletic Performance</div><div class="ob-option-desc">Get faster, stronger, more explosive</div></div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obSelect('goals',this,'strength')"><div class="ob-option-icon">💪</div><div class="ob-option-text"><div class="ob-option-label">Build Strength & Muscle</div><div class="ob-option-desc">Progressive overload, hypertrophy focus</div></div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obSelect('goals',this,'fat_loss')"><div class="ob-option-icon">🔥</div><div class="ob-option-text"><div class="ob-option-label">Lose Fat, Stay Lean</div><div class="ob-option-desc">Recomposition, conditioning, nutrition</div></div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obSelect('goals',this,'health')"><div class="ob-option-icon">❤️</div><div class="ob-option-text"><div class="ob-option-label">General Health & Longevity</div><div class="ob-option-desc">Move well, feel great, reduce injury risk</div></div><div class="ob-check">✓</div></div>
+
+  <!-- Step 1: Schedule + Equipment -->
+  <div class="ob-step" id="ob-step-1">
+    <div class="ob-header">
+      <div class="ob-act">STEP 2 OF 2 · YOUR SETUP</div>
+      <div class="ob-title">Your schedule & gear.</div>
+      <div class="ob-sub">Tap each day to set a training type. We'll build on this later.</div>
     </div>
-    <button class="ob-next" id="ob-next-1" disabled onclick="obNext(2)">Continue →</button>
-  </div>
-  <div class="ob-step" id="ob-step-2" style="padding-top:calc(var(--safe-top) + 72px)">
-    <div class="ob-step-num">STEP 3 OF 5</div>
-    <div class="ob-title">Your training level & gear</div>
-    <div class="ob-sub">So I can calibrate intensity, volume, and exercise selection.</div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EXPERIENCE LEVEL</div>
-    <div class="ob-options" id="ob-level" style="flex:0;margin-bottom:20px">
-      <div class="ob-option" onclick="obSelect('level',this,'beginner')"><div class="ob-option-icon">🌱</div><div class="ob-option-text"><div class="ob-option-label">Beginner</div><div class="ob-option-desc">Under 1 year consistent training</div></div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obSelect('level',this,'intermediate')"><div class="ob-option-icon">⚡</div><div class="ob-option-text"><div class="ob-option-label">Intermediate</div><div class="ob-option-desc">1–4 years, solid movement patterns</div></div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obSelect('level',this,'advanced')"><div class="ob-option-icon">🔥</div><div class="ob-option-text"><div class="ob-option-label">Advanced</div><div class="ob-option-desc">4+ years, training is a lifestyle</div></div><div class="ob-check">✓</div></div>
-    </div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">EQUIPMENT (select all)</div>
-    <div class="ob-grid" id="ob-equipment">
-      <div class="ob-option" onclick="obToggle('equipment',this,'kettlebell')"><div class="ob-option-icon">🏋️</div><div class="ob-option-label" style="font-size:13px">Kettlebells</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('equipment',this,'barbell')"><div class="ob-option-icon">🏋️</div><div class="ob-option-label" style="font-size:13px">Barbell</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('equipment',this,'dumbbells')"><div class="ob-option-icon">💪</div><div class="ob-option-label" style="font-size:13px">Dumbbells</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('equipment',this,'bodyweight')"><div class="ob-option-icon">🤸</div><div class="ob-option-label" style="font-size:13px">Bodyweight</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('equipment',this,'cardio_machines')"><div class="ob-option-icon">🏃</div><div class="ob-option-label" style="font-size:13px">Cardio Machines</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('equipment',this,'full_gym')"><div class="ob-option-icon">🏟️</div><div class="ob-option-label" style="font-size:13px">Full Gym</div><div class="ob-check">✓</div></div>
-    </div>
-    <button class="ob-next" id="ob-next-2" disabled onclick="obNext(3)">Continue →</button>
-  </div>
-  <div class="ob-step" id="ob-step-3" style="padding-top:calc(var(--safe-top) + 72px)">
-    <div class="ob-step-num">STEP 4 OF 5</div>
-    <div class="ob-title">Build your weekly schedule</div>
-    <div class="ob-sub">Tap a day to set your training type. This drives your Today screen and AI recommendations.</div>
+
+    <div class="ob-section-label">WEEKLY SCHEDULE</div>
     <div class="ob-day-grid" id="ob-day-grid"></div>
-    <div id="ob-day-types" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
-    <button class="ob-next" onclick="obNext(4)">Continue →</button>
-  </div>
-  <div class="ob-step" id="ob-step-4" style="padding-top:calc(var(--safe-top) + 72px)">
-    <div class="ob-step-num">STEP 5 OF 5</div>
-    <div class="ob-title">Last thing — your diet</div>
-    <div class="ob-sub">Your AI coach uses this to personalize nutrition timing and meal suggestions.</div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">PROTEIN SOURCES (select all you eat)</div>
-    <div class="ob-grid" id="ob-proteins" style="margin-bottom:20px">
-      <div class="ob-option" onclick="obToggle('proteins',this,'chicken')"><div class="ob-option-icon">🍗</div><div class="ob-option-label" style="font-size:13px">Chicken</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('proteins',this,'beef')"><div class="ob-option-icon">🥩</div><div class="ob-option-label" style="font-size:13px">Beef</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('proteins',this,'fish')"><div class="ob-option-icon">🐟</div><div class="ob-option-label" style="font-size:13px">Fish</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('proteins',this,'eggs')"><div class="ob-option-icon">🥚</div><div class="ob-option-label" style="font-size:13px">Eggs</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('proteins',this,'protein_shakes')"><div class="ob-option-icon">🥤</div><div class="ob-option-label" style="font-size:13px">Protein Shakes</div><div class="ob-check">✓</div></div>
-      <div class="ob-option" onclick="obToggle('proteins',this,'plant_based')"><div class="ob-option-icon">🌱</div><div class="ob-option-label" style="font-size:13px">Plant-Based</div><div class="ob-check">✓</div></div>
+    <div id="ob-day-editor" class="ob-day-editor">
+      <div class="ob-day-editing" id="ob-day-editing-label">Tap a day to edit</div>
+      <div class="ob-type-grid" id="ob-type-grid"></div>
     </div>
-    <div style="font-size:11px;color:var(--gold);letter-spacing:2px;font-weight:700;margin-bottom:10px">SUPPLEMENTS (optional)</div>
-    <input class="ob-name-input" id="ob-supplements" placeholder="e.g. creatine, vitamin D, fish oil" style="font-size:15px;font-weight:400;padding:14px 16px">
-    <div style="flex:1"></div>
-    <button class="ob-next" onclick="obFinish()">Start Training 🔥</button>
-    <button class="ob-skip" onclick="obFinish()">Skip for now</button>
+
+    <div class="ob-section-label">EQUIPMENT</div>
+    <div class="ob-equip-grid" id="ob-equip-grid">
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'kettlebell')"><span class="ob-equip-icon">🏋️</span><span class="ob-equip-label">Kettlebells</span></div>
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'barbell')"><span class="ob-equip-icon">🏋️</span><span class="ob-equip-label">Barbell</span></div>
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'dumbbells')"><span class="ob-equip-icon">💪</span><span class="ob-equip-label">Dumbbells</span></div>
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'bodyweight')"><span class="ob-equip-icon">🤸</span><span class="ob-equip-label">Bodyweight</span></div>
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'cardio_machines')"><span class="ob-equip-icon">🏃</span><span class="ob-equip-label">Cardio Machines</span></div>
+      <div class="ob-equip-btn" onclick="obToggleEquip(this,'full_gym')"><span class="ob-equip-icon">🏟️</span><span class="ob-equip-label">Full Gym</span></div>
+    </div>
+
+    <button class="ob-next" style="margin-top:24px" onclick="obFinishLogistics()">Continue to Your Story →</button>
+  </div>
+
+</div>
+
+<!-- ── INTAKE: ACT 2 — AI CONVERSATION ── -->
+<div id="intake-screen">
+  <div class="intake-header">
+    <div class="intake-title">YOUR STORY</div>
+    <div class="intake-sub">Conversation with your AI coach · Private & confidential</div>
+    <div class="intake-progress"><div class="intake-progress-bar" id="intake-progress-bar"></div></div>
+  </div>
+  <div class="intake-chat" id="intake-chat"></div>
+  <div class="intake-input-row">
+    <textarea id="intake-input" placeholder="Type your answer..." rows="1"
+      onkeydown="handleIntakeKey(event)" oninput="autoResizeTA(this)"></textarea>
+    <button class="intake-send" onclick="sendIntakeMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
   </div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ── UPLOAD: ACT 3 — HEALTH DATA ── -->
+<div id="upload-screen">
+  <div class="upload-content">
+    <div style="padding-top: calc(var(--safe-top))">
+      <div style="margin-bottom:28px">
+        <div style="font-size:10px;color:var(--muted);letter-spacing:2px;font-weight:700;margin-bottom:8px">OPTIONAL · HIGH VALUE</div>
+        <div style="font-size:24px;font-weight:700;line-height:1.2;margin-bottom:8px">Upload your health data.</div>
+        <div style="font-size:14px;color:var(--muted);line-height:1.6">Blood panels, genetic data, wearable exports — your coach will read them and use them to personalize everything. Raw files stay private. Only your coach ever reads them.</div>
+      </div>
+
+      <div class="upload-zone" onclick="document.getElementById('file-input').click()" id="upload-zone">
+        <div class="upload-zone-icon">🧬</div>
+        <div class="upload-zone-title">Tap to upload a file</div>
+        <div class="upload-zone-sub">Labs, genetics, wearable exports</div>
+        <div class="upload-types">
+          <span class="upload-type-tag">Blood Panel PDF</span>
+          <span class="upload-type-tag">23andMe Raw Data</span>
+          <span class="upload-type-tag">AncestryDNA</span>
+          <span class="upload-type-tag">Oura Export</span>
+          <span class="upload-type-tag">Garmin CSV</span>
+          <span class="upload-type-tag">Any Health Report</span>
+        </div>
+      </div>
+      <input type="file" id="file-input" style="display:none" accept=".pdf,.txt,.csv,.json,.zip"
+        onchange="handleFileUpload(event)">
+
+      <div class="uploaded-files" id="uploaded-files"></div>
+
+      <button class="btn-primary" onclick="finishUpload()" id="upload-done-btn" style="margin-top:8px">
+        Enter the App →
+      </button>
+      <button class="skip-upload" onclick="finishUpload()">Skip for now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
 <div id="main-screen" class="screen">
 
   <!-- TODAY TAB -->
-  <div id="tab-today" class="tab-content active" style="display:flex;flex-direction:column;height:100%">
-    <div class="content-area" id="today-scroll">
+  <div id="tab-today" style="display:flex;flex-direction:column;height:100%">
+    <div class="content-area">
       <div class="page-header">
         <div>
           <div class="page-title">TODAY</div>
@@ -295,7 +366,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="card-label">THIS WEEK</div>
         <div class="days-row" id="week-strip"></div>
       </div>
-      <div class="card card-gold" id="hrv-card">
+      <div class="card card-gold">
         <div class="card-label">READINESS</div>
         <div class="metrics-row">
           <div class="metric-tile"><div class="metric-val" id="hrv-val">—</div><div class="metric-label">HRV ms</div></div>
@@ -305,7 +376,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div id="readiness-msg" style="margin-top:10px;font-size:13px;color:var(--muted);line-height:1.5"></div>
         <button onclick="logMetrics()" style="margin-top:10px;background:none;border:1px solid var(--gold-border);border-radius:8px;padding:8px 14px;color:var(--gold);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;letter-spacing:1px">+ LOG METRICS</button>
       </div>
-      <div class="workout-card" id="workout-card">
+      <div class="workout-card">
         <div class="workout-header">
           <div>
             <div class="workout-type" id="workout-title">Loading...</div>
@@ -317,13 +388,13 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
       </div>
       <div class="card" style="cursor:pointer" onclick="switchTab('coach')">
         <div class="card-label">AI COACH</div>
-        <div style="font-size:14px;color:var(--white);line-height:1.5" id="coach-preview">Ask me anything about today's training, recovery, or nutrition →</div>
+        <div style="font-size:14px;color:var(--white);line-height:1.5">Ask me anything about today's training, recovery, or nutrition →</div>
       </div>
     </div>
   </div>
 
   <!-- COACH TAB -->
-  <div id="tab-coach" class="tab-content" style="display:none;flex-direction:column;height:100%">
+  <div id="tab-coach" style="display:none;flex-direction:column;height:100%">
     <div class="page-header">
       <div>
         <div class="page-title">AI COACH</div>
@@ -331,16 +402,17 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
       </div>
       <div style="font-size:20px">🤖</div>
     </div>
-    <div class="suggestions" id="suggestions-row">
+    <div class="suggestions">
       <div class="suggestion-chip" onclick="sendSuggestion(this)">What should I do today?</div>
       <div class="suggestion-chip" onclick="sendSuggestion(this)">How's my recovery?</div>
       <div class="suggestion-chip" onclick="sendSuggestion(this)">Plan this week's training</div>
       <div class="suggestion-chip" onclick="sendSuggestion(this)">Pre-workout meal ideas</div>
-      <div class="suggestion-chip" onclick="sendSuggestion(this)">Kettlebell program</div>
+      <div class="suggestion-chip" onclick="sendSuggestion(this)">Explain my lab results</div>
     </div>
     <div class="chat-area" id="chat-area"></div>
     <div class="chat-input-row">
-      <textarea id="chat-input" placeholder="Ask your coach..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+      <textarea id="chat-input" placeholder="Ask your coach..." rows="1"
+        onkeydown="handleChatKey(event)" oninput="autoResizeTA(this)"></textarea>
       <button class="send-btn" onclick="sendMessage()">
         <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
       </button>
@@ -348,7 +420,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   </div>
 
   <!-- PROFILE TAB -->
-  <div id="tab-profile" class="tab-content" style="display:none;flex-direction:column;height:100%">
+  <div id="tab-profile" style="display:none;flex-direction:column;height:100%">
     <div class="content-area">
       <div class="profile-header">
         <div class="avatar">⚡</div>
@@ -356,29 +428,14 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         <div class="profile-tier" id="profile-tier">FREE TIER</div>
       </div>
 
-      <!-- DEBUG BADGE -->
       <div class="debug-badge">
         <div class="debug-title">🔬 TESTING INFO</div>
-        <div class="debug-row">
-          <span class="debug-key">Tier</span>
-          <span class="debug-val tier-free" id="debug-tier">—</span>
-        </div>
-        <div class="debug-row">
-          <span class="debug-key">AI Model</span>
-          <span class="debug-val" id="debug-model">—</span>
-        </div>
-        <div class="debug-row">
-          <span class="debug-key">Override Active</span>
-          <span class="debug-val" id="debug-override">—</span>
-        </div>
-        <div class="debug-row">
-          <span class="debug-key">Onboarded</span>
-          <span class="debug-val" id="debug-onboarded">—</span>
-        </div>
-        <div class="debug-row">
-          <span class="debug-key">User ID</span>
-          <span class="debug-val" id="debug-uid" style="font-size:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span>
-        </div>
+        <div class="debug-row"><span class="debug-key">Tier</span><span class="debug-val tier-free" id="debug-tier">—</span></div>
+        <div class="debug-row"><span class="debug-key">AI Model</span><span class="debug-val" id="debug-model">—</span></div>
+        <div class="debug-row"><span class="debug-key">Override Active</span><span class="debug-val" id="debug-override">—</span></div>
+        <div class="debug-row"><span class="debug-key">Intake Complete</span><span class="debug-val" id="debug-intake">—</span></div>
+        <div class="debug-row"><span class="debug-key">Health Files</span><span class="debug-val" id="debug-files">—</span></div>
+        <div class="debug-row"><span class="debug-key">User ID</span><span class="debug-val" id="debug-uid" style="font-size:10px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</span></div>
       </div>
 
       <div class="settings-group">
@@ -390,6 +447,18 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
             <button onclick="redeemCode()" style="background:var(--gold);border:none;border-radius:10px;padding:10px 16px;color:#0A0A0F;font-weight:700;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif">REDEEM</button>
           </div>
           <div id="invite-result" style="margin-top:8px;font-size:13px;min-height:18px"></div>
+        </div>
+      </div>
+
+      <div class="settings-group">
+        <div class="settings-label">HEALTH DATA</div>
+        <div class="settings-row" onclick="openUploadFlow()">
+          <div class="settings-row-label">Upload Labs / Genetics</div>
+          <div class="settings-row-val" id="health-files-count">→</div>
+        </div>
+        <div class="settings-row">
+          <div class="settings-row-label">Apple Health</div>
+          <div class="settings-row-val">iOS app required</div>
         </div>
       </div>
 
@@ -409,36 +478,20 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
         </div>
       </div>
 
-      <div class="settings-group">
-        <div class="settings-label">DATA</div>
-        <div class="settings-row">
-          <div class="settings-row-label">Apple Health</div>
-          <div class="settings-row-val" id="health-status">Not connected</div>
-        </div>
-        <div class="settings-row">
-          <div class="settings-row-label">Genomic Data</div>
-          <div class="settings-row-val" id="genomic-status">Not uploaded</div>
-        </div>
-      </div>
-
       <button class="signout-btn" onclick="signOut()">Sign Out</button>
       <div style="height:20px"></div>
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
   <nav class="nav-bar">
     <button class="nav-item active" id="nav-today" onclick="switchTab('today')">
-      <span class="nav-icon">⚡</span>
-      <span class="nav-label">TODAY</span>
+      <span class="nav-icon">⚡</span><span class="nav-label">TODAY</span>
     </button>
     <button class="nav-item" id="nav-coach" onclick="switchTab('coach')">
-      <span class="nav-icon">🤖</span>
-      <span class="nav-label">COACH</span>
+      <span class="nav-icon">🤖</span><span class="nav-label">COACH</span>
     </button>
     <button class="nav-item" id="nav-profile" onclick="switchTab('profile')">
-      <span class="nav-icon">👤</span>
-      <span class="nav-label">PROFILE</span>
+      <span class="nav-icon">👤</span><span class="nav-label">PROFILE</span>
     </button>
   </nav>
 </div>
@@ -464,7 +517,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 <script>
 const SUPABASE_URL = 'https://bhjmebxgcmcmwoeqxxvs.supabase.co';
 const SUPABASE_ANON = 'sb_publishable_tY3mw8BgW-U9qgs4FUUxIg_t2qDwEVQ';
-const API_URL = 'https://solaryn-fit.vercel.app/api/coach';
+const API_URL = 'https://solaryn-fit.vercel.app';
 
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 let currentUser = null;
@@ -472,46 +525,61 @@ let currentProfile = null;
 let chatHistory = [];
 let exerciseDone = {};
 
-// ── TIER → MODEL MAP ──────────────────────────────────────────
 const TIER_INFO = {
-  free:    { label:'FREE',    model:'Claude Haiku 4.5',                  cssClass:'tier-free'    },
-  app:     { label:'APP',     model:'Claude Haiku 4.5',                  cssClass:'tier-app'     },
-  coached: { label:'COACHED', model:'Claude Sonnet 4.6',                 cssClass:'tier-coached' },
-  elite:   { label:'ELITE',   model:'Sonnet 4.6 + Opus analysis',        cssClass:'tier-elite'   },
+  free:    { label:'FREE',    model:'Claude Haiku 4.5',             cssClass:'tier-free'    },
+  app:     { label:'APP',     model:'Claude Haiku 4.5',             cssClass:'tier-app'     },
+  coached: { label:'COACHED', model:'Claude Sonnet 4.6',            cssClass:'tier-coached' },
+  elite:   { label:'ELITE',   model:'Sonnet 4.6 + Opus analysis',   cssClass:'tier-elite'   },
 };
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
   const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    currentUser = session.user;
-    await loadProfile();
-    showApp();
-  }
+  if (session) { currentUser = session.user; await loadProfile(); routeUser(); }
 });
 
 sb.auth.onAuthStateChange(async (event, session) => {
   if (event === 'SIGNED_IN' && session) {
     currentUser = session.user;
     await loadProfile();
-    showApp();
+    routeUser();
   } else if (event === 'SIGNED_OUT') {
-    currentUser = null;
-    currentProfile = null;
-    showAuth();
+    currentUser = null; currentProfile = null;
+    showScreen('auth-screen');
   }
 });
 
+function showScreen(id) {
+  ['auth-screen','onboarding-screen','intake-screen','upload-screen','main-screen']
+    .forEach(s => {
+      const el = document.getElementById(s);
+      if (s === id) { el.classList.add('active'); el.style.display = 'flex'; }
+      else { el.classList.remove('active'); el.style.display = 'none'; }
+    });
+}
+
+function routeUser() {
+  if (!currentProfile) { showScreen('auth-screen'); return; }
+  if (!currentProfile.onboarded) {
+    // New user — start logistics
+    showScreen('onboarding-screen');
+    obInit();
+  } else {
+    // Returning user — main app
+    showScreen('main-screen');
+    initToday();
+    loadTodayMetrics();
+  }
+}
+
 // ── AUTH ──────────────────────────────────────────────────────
 let isSignUp = false;
-
 function toggleAuthMode() {
   isSignUp = !isSignUp;
   document.getElementById('auth-toggle-text').innerHTML = isSignUp
     ? 'Already have an account? <span>Sign in →</span>'
     : 'New here? <span>Create an account →</span>';
 }
-
 async function signIn() {
   const email = document.getElementById('auth-email').value.trim();
   const pass = document.getElementById('auth-password').value;
@@ -521,7 +589,6 @@ async function signIn() {
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
   if (error) errEl.textContent = error.message;
 }
-
 async function signUp() {
   const email = document.getElementById('auth-email').value.trim();
   const pass = document.getElementById('auth-password').value;
@@ -530,147 +597,244 @@ async function signUp() {
   if (!email || !pass) { errEl.textContent = 'Please enter email and password'; return; }
   if (pass.length < 6) { errEl.textContent = 'Password must be at least 6 characters'; return; }
   const { error } = await sb.auth.signUp({ email, password: pass });
-  if (error) errEl.textContent = error.message;
-  else {
-    showToast("Account created! Signing you in...");
-    const { error: signInErr } = await sb.auth.signInWithPassword({ email, password: pass });
-    if (signInErr) errEl.textContent = signInErr.message;
-  }
+  if (error) { errEl.textContent = error.message; return; }
+  showToast('Account created! Signing you in...');
+  const { error: e2 } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (e2) errEl.textContent = e2.message;
 }
-
 async function signOut() { await sb.auth.signOut(); }
 
-function showAuth() {
-  document.getElementById('auth-screen').classList.add('active');
-  document.getElementById('main-screen').classList.remove('active');
-}
-
-function showApp() {
-  document.getElementById('auth-screen').classList.remove('active');
-  if (!currentProfile?.onboarded) {
-    document.getElementById('onboarding-screen').classList.add('active');
-    document.getElementById('main-screen').classList.remove('active');
-    obInit();
-  } else {
-    document.getElementById('onboarding-screen').classList.remove('active');
-    document.getElementById('main-screen').classList.add('active');
-    initToday();
-    loadTodayMetrics();
-  }
-}
-
-// ── ONBOARDING ────────────────────────────────────────────────
-const obData = { name: '', goals: null, level: null, equipment: [], schedule: {}, proteins: [], supplements: '' };
-let obCurrentStep = 0;
+// ── ONBOARDING: LOGISTICS ─────────────────────────────────────
+const OB_TYPES = ['rest','strength','cardio','hiit','sport','pilates','yoga','run','recovery'];
+const OB_TYPE_EMOJIS = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
+const OB_DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+let obSchedule = {};
+let obEquipment = [];
+let obEditingDay = null;
 
 function obInit() {
-  obCurrentStep = 0;
-  const dayLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const types = ['rest','strength','cardio','hiit','sport','pilates','yoga','run','recovery'];
-  const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
-
+  // Build day grid
   const grid = document.getElementById('ob-day-grid');
-  grid.innerHTML = dayLabels.map((d, i) => `
-    <div class="ob-day-btn" id="ob-day-${i}" onclick="obSelectDay(${i})">
-      <div class="ob-day-name">${d[0]}</div>
+  grid.innerHTML = ['S','M','T','W','T','F','S'].map((d,i) =>
+    `<div class="ob-day-btn" id="ob-day-${i}" onclick="obSelectDay(${i})">
+      <div class="ob-day-letter">${d}</div>
       <div class="ob-day-emoji" id="ob-day-emoji-${i}">😴</div>
-    </div>
-  `).join('');
+    </div>`).join('');
 
-  const typesEl = document.getElementById('ob-day-types');
-  typesEl.innerHTML = `
-    <div id="ob-day-editor" style="display:none">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:8px" id="ob-day-editing-label">Editing: Sunday</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px" id="ob-type-btns">
-        ${types.map(t => `<div onclick="obSetDayType(this,'${t}')" data-type="${t}" style="background:var(--card);border:1.5px solid var(--border);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all 0.2s">
-          <div style="font-size:20px">${typeEmojis[t]}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;text-transform:capitalize">${t}</div>
-        </div>`).join('')}
-      </div>
-    </div>
-    <div id="ob-day-hint" style="text-align:center;padding:20px;color:var(--muted);font-size:13px">↑ Tap a day above to set its type</div>
-  `;
-  obGoToStep(0);
+  // Build type grid
+  const tg = document.getElementById('ob-type-grid');
+  tg.innerHTML = OB_TYPES.map(t =>
+    `<div class="ob-type-btn" data-type="${t}" onclick="obSetDayType('${t}')">
+      <div class="ob-type-emoji">${OB_TYPE_EMOJIS[t]}</div>
+      <div class="ob-type-label">${t}</div>
+    </div>`).join('');
+
+  obGoTo(0);
 }
 
-function obGoToStep(step) {
-  document.querySelectorAll('.ob-step').forEach((el, i) => el.classList.toggle('active', i === step));
-  document.querySelectorAll('.ob-dot').forEach((el, i) => el.classList.toggle('done', i <= step));
-  obCurrentStep = step;
+function obGoTo(step) {
+  document.querySelectorAll('.ob-step').forEach((el,i) => el.classList.toggle('active', i === step));
 }
-
-function obNext(step) { obGoToStep(step); }
-
-function obSelect(group, el, val) {
-  document.querySelectorAll(`#ob-${group} .ob-option`).forEach(o => o.classList.remove('selected'));
-  el.classList.add('selected');
-  obData[group] = val;
-  const nextBtn = document.getElementById(`ob-next-${obCurrentStep}`);
-  if (nextBtn) nextBtn.disabled = false;
-}
-
-function obToggle(group, el, val) {
-  el.classList.toggle('selected');
-  if (!obData[group]) obData[group] = [];
-  if (el.classList.contains('selected')) { if (!obData[group].includes(val)) obData[group].push(val); }
-  else { obData[group] = obData[group].filter(v => v !== val); }
-}
-
-let obEditingDay = null;
-const typeEmojis = { rest:'😴', strength:'🏋️', cardio:'🏃', hiit:'⚡', sport:'⚽', pilates:'🤸', yoga:'🧘', run:'👟', recovery:'🧊' };
-const dayNames = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 function obSelectDay(i) {
   document.querySelectorAll('.ob-day-btn').forEach(b => b.style.borderColor = '');
   document.getElementById(`ob-day-${i}`).style.borderColor = 'var(--gold)';
   obEditingDay = i;
-  document.getElementById('ob-day-editor').style.display = 'block';
-  document.getElementById('ob-day-hint').style.display = 'none';
-  document.getElementById('ob-day-editing-label').textContent = `Editing: ${dayNames[i]}`;
-  const current = obData.schedule[i]?.type || 'rest';
-  document.querySelectorAll('#ob-type-btns [data-type]').forEach(btn => {
-    const sel = btn.dataset.type === current;
-    btn.style.borderColor = sel ? 'var(--gold)' : 'var(--border)';
-    btn.style.background = sel ? 'var(--gold-dim)' : 'var(--card)';
+  const editor = document.getElementById('ob-day-editor');
+  editor.classList.add('visible');
+  document.getElementById('ob-day-editing-label').textContent = `Setting: ${OB_DAY_NAMES[i]}`;
+  const current = obSchedule[i]?.type || 'rest';
+  document.querySelectorAll('#ob-type-grid .ob-type-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.type === current);
   });
 }
 
-function obSetDayType(el, type) {
+function obSetDayType(type) {
   if (obEditingDay === null) return;
-  obData.schedule[obEditingDay] = { type };
-  document.querySelectorAll('#ob-type-btns [data-type]').forEach(btn => {
-    btn.style.borderColor = btn.dataset.type === type ? 'var(--gold)' : 'var(--border)';
-    btn.style.background = btn.dataset.type === type ? 'var(--gold-dim)' : 'var(--card)';
-  });
-  document.getElementById(`ob-day-emoji-${obEditingDay}`).textContent = typeEmojis[type] || '💪';
+  obSchedule[obEditingDay] = { type };
+  document.querySelectorAll('#ob-type-grid .ob-type-btn').forEach(btn =>
+    btn.classList.toggle('selected', btn.dataset.type === type));
+  document.getElementById(`ob-day-emoji-${obEditingDay}`).textContent = OB_TYPE_EMOJIS[type] || '💪';
   document.getElementById(`ob-day-${obEditingDay}`).classList.add('active');
 }
 
-async function obFinish() {
-  if (!currentUser) return;
-  obData.name = document.getElementById('ob-name').value.trim() || currentUser.email.split('@')[0];
-  obData.supplements = document.getElementById('ob-supplements').value.trim();
-  const finalSchedule = {};
-  for (let i = 0; i < 7; i++) finalSchedule[i] = obData.schedule[i] || { type: 'rest' };
+function obToggleEquip(el, val) {
+  el.classList.toggle('selected');
+  if (el.classList.contains('selected')) { if (!obEquipment.includes(val)) obEquipment.push(val); }
+  else { obEquipment = obEquipment.filter(v => v !== val); }
+}
 
+async function obFinishLogistics() {
+  if (!currentUser) return;
+  const name = document.getElementById('ob-name').value.trim() || currentUser.email.split('@')[0];
+  const finalSchedule = {};
+  for (let i = 0; i < 7; i++) finalSchedule[i] = obSchedule[i] || { type: 'rest' };
+
+  // Save logistics to profile (not yet onboarded — intake still pending)
   await sb.from('profiles').update({
-    full_name: obData.name,
-    goals: obData.goals ? [obData.goals] : ['general_fitness'],
-    activity_level: obData.level || 'intermediate',
-    equipment: obData.equipment.length ? obData.equipment : ['bodyweight'],
+    full_name: name,
+    equipment: obEquipment.length ? obEquipment : ['bodyweight'],
     schedule: finalSchedule,
-    diet_proteins: obData.proteins.length ? obData.proteins : ['chicken', 'beef'],
-    supplements: obData.supplements ? obData.supplements.split(',').map(s => s.trim()) : [],
-    onboarded: true,
     language: navigator.language?.startsWith('es') ? 'es' : 'en'
   }).eq('id', currentUser.id);
 
   await loadProfile();
-  document.getElementById('onboarding-screen').classList.remove('active');
-  document.getElementById('main-screen').classList.add('active');
+  // Move to intake conversation
+  startIntake(name);
+}
+
+// ── INTAKE CONVERSATION ───────────────────────────────────────
+let intakeHistory = [];
+let intakeExchanges = 0;
+
+function startIntake(name) {
+  showScreen('intake-screen');
+  intakeHistory = [];
+  intakeExchanges = 0;
+
+  // Opening message from AI
+  const opening = `Hey ${name} — I'm going to be your coach inside this app. Before I can actually be useful, I need to understand where you really are, not just the surface stuff.\n\nSo let's start there: **what's not working right now?** What brought you here?`;
+  addIntakeMsg('ai', opening);
+}
+
+function addIntakeMsg(role, text) {
+  const chat = document.getElementById('intake-chat');
+  const div = document.createElement('div');
+  div.className = `intake-msg ${role}`;
+  div.innerHTML = `<div class="intake-bubble">${text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function addIntakeTyping() {
+  const chat = document.getElementById('intake-chat');
+  const div = document.createElement('div');
+  div.className = 'intake-msg ai';
+  div.innerHTML = `<div class="intake-bubble"><div class="intake-typing"><div class="intake-dot"></div><div class="intake-dot"></div><div class="intake-dot"></div></div></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+  return div;
+}
+
+function handleIntakeKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendIntakeMessage(); }
+}
+
+async function sendIntakeMessage() {
+  const input = document.getElementById('intake-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = '44px';
+  addIntakeMsg('user', text);
+  intakeHistory.push({ role: 'user', content: text });
+  intakeExchanges++;
+
+  // Update progress bar (rough estimate, caps at 90% until complete)
+  const progress = Math.min(90, intakeExchanges * 10);
+  document.getElementById('intake-progress-bar').style.width = progress + '%';
+
+  const typing = addIntakeTyping();
+  try {
+    const res = await fetch(`${API_URL}/api/intake`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: intakeHistory, user_id: currentUser?.id })
+    });
+    const data = await res.json();
+    typing.remove();
+    addIntakeMsg('ai', data.reply || 'Something went wrong — try again.');
+    intakeHistory.push({ role: 'assistant', content: data.reply });
+
+    if (data.intake_complete) {
+      document.getElementById('intake-progress-bar').style.width = '100%';
+      // Brief pause then move to upload screen
+      setTimeout(() => showScreen('upload-screen'), 2000);
+    }
+  } catch (err) {
+    typing.remove();
+    addIntakeMsg('ai', 'Connection issue — check your internet and try again.');
+  }
+}
+
+// ── FILE UPLOAD ───────────────────────────────────────────────
+let uploadedFiles = [];
+
+async function handleFileUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const fileEntry = { name: file.name, type: file.type, status: 'processing', summary: null };
+  uploadedFiles.push(fileEntry);
+  renderUploadedFiles();
+
+  try {
+    // Read file as base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+    const res = await fetch(`${API_URL}/api/intake`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'process_file',
+        user_id: currentUser?.id,
+        file_data: base64,
+        file_type: file.type,
+        file_name: file.name
+      })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      fileEntry.status = 'done';
+      fileEntry.summary = data.summary;
+    } else {
+      fileEntry.status = 'error';
+      fileEntry.summary = data.error || 'Processing failed';
+    }
+  } catch (err) {
+    fileEntry.status = 'error';
+    fileEntry.summary = 'Upload failed — check your connection';
+  }
+
+  renderUploadedFiles();
+  // Reset input so same file can be re-uploaded
+  event.target.value = '';
+}
+
+function renderUploadedFiles() {
+  const container = document.getElementById('uploaded-files');
+  container.innerHTML = uploadedFiles.map(f => `
+    <div class="uploaded-file">
+      <div class="uploaded-file-header">
+        <div class="uploaded-file-name">${f.name}</div>
+        <div class="uploaded-file-status ${f.status}">
+          ${f.status === 'processing' ? '⏳ Processing...' : f.status === 'done' ? '✓ Analyzed' : '✗ Error'}
+        </div>
+      </div>
+      ${f.summary ? `<div class="uploaded-file-summary">${f.summary.substring(0,200)}...</div>` : ''}
+    </div>`).join('');
+}
+
+async function finishUpload() {
+  // Mark user as fully onboarded
+  await sb.from('profiles').update({ onboarded: true }).eq('id', currentUser?.id);
+  await loadProfile();
+  showScreen('main-screen');
   initToday();
   loadTodayMetrics();
-  showToast(`Welcome, ${obData.name}! 🔥`);
+  const name = currentProfile?.full_name?.split(' ')[0] || 'there';
+  showToast(`Welcome, ${name}! 🔥`);
+}
+
+// Allow re-uploading from profile
+function openUploadFlow() {
+  showScreen('upload-screen');
 }
 
 // ── PROFILE ───────────────────────────────────────────────────
@@ -679,9 +843,7 @@ async function loadProfile() {
   const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
   currentProfile = data;
 
-  // Determine effective tier (override takes priority)
-  let overrideActive = false;
-  let overrideTierName = null;
+  let overrideActive = false, overrideTier = null;
   let effectiveTier = data?.subscription_tier?.toLowerCase() || 'free';
 
   const { data: override } = await sb.rpc('get_access_override', {
@@ -689,29 +851,33 @@ async function loadProfile() {
   });
   if (override?.length) {
     overrideActive = true;
-    overrideTierName = override[0].tier;
+    overrideTier = override[0].tier;
     effectiveTier = override[0].tier.toLowerCase();
   }
 
   const tierInfo = TIER_INFO[effectiveTier] || TIER_INFO.free;
 
   if (data) {
-    document.getElementById('profile-name').textContent = data.full_name || data.email?.split('@')[0] || 'Athlete';
-    document.getElementById('profile-email').textContent = data.email || currentUser.email;
-    document.getElementById('profile-tier').textContent = tierInfo.label + (overrideActive ? ' ✦' : '') + ' TIER';
-    document.getElementById('coach-tier-label').textContent =
-      (effectiveTier === 'elite' || effectiveTier === 'coached')
-        ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
+    const nameEl = document.getElementById('profile-name');
+    const tierEl = document.getElementById('profile-tier');
+    const coachEl = document.getElementById('coach-tier-label');
+    if (nameEl) nameEl.textContent = data.full_name || data.email?.split('@')[0] || 'Athlete';
+    if (document.getElementById('profile-email')) document.getElementById('profile-email').textContent = data.email || currentUser.email;
+    if (tierEl) tierEl.textContent = tierInfo.label + (overrideActive ? ' ✦' : '') + ' TIER';
+    if (coachEl) coachEl.textContent = (effectiveTier === 'elite' || effectiveTier === 'coached') ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
 
     // Debug badge
-    const dbgTier = document.getElementById('debug-tier');
-    dbgTier.textContent = tierInfo.label;
-    dbgTier.className = `debug-val ${tierInfo.cssClass}`;
-    document.getElementById('debug-model').textContent = tierInfo.model;
-    document.getElementById('debug-override').textContent = overrideActive
-      ? `✓ Yes — ${overrideTierName}` : '✗ No';
-    document.getElementById('debug-onboarded').textContent = data.onboarded ? '✓ Yes' : '✗ No';
-    document.getElementById('debug-uid').textContent = currentUser.id;
+    const dbTier = document.getElementById('debug-tier');
+    if (dbTier) { dbTier.textContent = tierInfo.label; dbTier.className = `debug-val ${tierInfo.cssClass}`; }
+    const dbModel = document.getElementById('debug-model'); if (dbModel) dbModel.textContent = tierInfo.model;
+    const dbOver = document.getElementById('debug-override'); if (dbOver) dbOver.textContent = overrideActive ? `✓ ${overrideTier}` : '✗ No';
+    const dbIntake = document.getElementById('debug-intake'); if (dbIntake) dbIntake.textContent = data.intake_narrative ? '✓ Yes' : '✗ No';
+    const dbUid = document.getElementById('debug-uid'); if (dbUid) dbUid.textContent = currentUser.id;
+
+    // Health files count
+    const { count } = await sb.from('genomic_insights').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+    const dbFiles = document.getElementById('debug-files'); if (dbFiles) dbFiles.textContent = `${count || 0} file(s)`;
+    const hfc = document.getElementById('health-files-count'); if (hfc) hfc.textContent = count ? `${count} uploaded` : '→';
   }
 }
 
@@ -741,32 +907,32 @@ const WORKOUT_TYPES = {
   rest:      { label:'Rest Day',  icon:'😴', exercises:[{name:'Rest & Recover',sets:'All day',notes:'Sleep 8hrs, eat well, hydrate'},{name:'Optional Walk',sets:'20 min',notes:'Light movement only'}]},
 };
 
-function getUserDaySchedule(dayOfWeek) {
+function getUserDaySchedule(dow) {
   const ps = currentProfile?.schedule;
-  if (ps && ps[dayOfWeek]) return WORKOUT_TYPES[ps[dayOfWeek].type] || WORKOUT_TYPES.rest;
-  const defaults = { 0:'recovery', 1:'sport', 2:'pilates', 3:'kettlebell', 4:'sport', 5:'run', 6:'rest' };
-  return WORKOUT_TYPES[defaults[dayOfWeek]] || WORKOUT_TYPES.rest;
+  if (ps && ps[dow]) return WORKOUT_TYPES[ps[dow].type] || WORKOUT_TYPES.rest;
+  const def = { 0:'recovery', 1:'sport', 2:'pilates', 3:'kettlebell', 4:'sport', 5:'run', 6:'rest' };
+  return WORKOUT_TYPES[def[dow]] || WORKOUT_TYPES.rest;
 }
 
 function buildWeekStrip(now) {
   const strip = document.getElementById('week-strip');
   const dl = ['S','M','T','W','T','F','S'];
   const today = now.getDay();
-  strip.innerHTML = dl.map((d, i) => {
+  strip.innerHTML = dl.map((d,i) => {
     const s = getUserDaySchedule(i);
-    return `<div class="day-pill ${i === today ? 'today' : ''}"><div class="day-name">${d}</div><div class="day-type">${s.icon}</div></div>`;
+    return `<div class="day-pill ${i===today?'today':''}"><div class="day-name">${d}</div><div class="day-type">${s.icon}</div></div>`;
   }).join('');
 }
 
-function buildWorkout(dayOfWeek) {
-  const s = getUserDaySchedule(dayOfWeek);
+function buildWorkout(dow) {
+  const s = getUserDaySchedule(dow);
   document.getElementById('workout-title').textContent = s.label;
   document.getElementById('workout-meta').textContent = `${s.exercises.length} exercises`;
   document.getElementById('workout-badge').textContent = s.label.toUpperCase();
-  document.getElementById('exercise-list').innerHTML = s.exercises.map((ex, i) => `
+  document.getElementById('exercise-list').innerHTML = s.exercises.map((ex,i) => `
     <div class="exercise-row">
       <div><div class="exercise-name">${ex.name}</div><div class="exercise-sets">${ex.sets} · ${ex.notes}</div></div>
-      <div class="exercise-check ${exerciseDone[i] ? 'done' : ''}" onclick="toggleExercise(${i}, this)">${exerciseDone[i] ? '✓' : ''}</div>
+      <div class="exercise-check ${exerciseDone[i]?'done':''}" onclick="toggleExercise(${i},this)">${exerciseDone[i]?'✓':''}</div>
     </div>`).join('');
 }
 
@@ -794,7 +960,6 @@ async function loadTodayMetrics() {
   }
 }
 
-// ── METRICS MODAL ─────────────────────────────────────────────
 function logMetrics() { document.getElementById('metrics-modal').style.display = 'flex'; }
 function closeMetrics() { document.getElementById('metrics-modal').style.display = 'none'; }
 async function saveMetrics() {
@@ -805,15 +970,13 @@ async function saveMetrics() {
   const weight = parseFloat(document.getElementById('log-weight').value) || null;
   const today = new Date().toISOString().split('T')[0];
   await sb.from('health_syncs').upsert({ user_id: currentUser.id, synced_date: today, hrv_ms: hrv, sleep_hrs: sleep, resting_hr: rhr, weight_lbs: weight }, { onConflict: 'user_id,synced_date' });
-  closeMetrics();
-  loadTodayMetrics();
-  showToast('Metrics saved ✓');
+  closeMetrics(); loadTodayMetrics(); showToast('Metrics saved ✓');
 }
 
 // ── CHAT ──────────────────────────────────────────────────────
 function sendSuggestion(el) { document.getElementById('chat-input').value = el.textContent; sendMessage(); }
 function handleChatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
-function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function autoResizeTA(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 
 async function sendMessage() {
   const input = document.getElementById('chat-input');
@@ -824,7 +987,7 @@ async function sendMessage() {
   chatHistory.push({ role: 'user', content: text });
   const typing = addTyping();
   try {
-    const res = await fetch(API_URL, {
+    const res = await fetch(`${API_URL}/api/coach`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: chatHistory, user_id: currentUser?.id })
     });
@@ -863,23 +1026,19 @@ function addTyping() {
 async function redeemCode() {
   const code = document.getElementById('invite-input').value.trim().toUpperCase();
   const result = document.getElementById('invite-result');
-  if (!code) return;
-  if (!currentUser) { result.style.color = 'var(--red)'; result.textContent = 'Sign in first'; return; }
+  if (!code || !currentUser) return;
   const { data, error } = await sb.rpc('redeem_invite_code', { p_code: code, p_user_id: currentUser.id });
   if (error || !data?.success) {
-    result.style.color = 'var(--red)';
-    result.textContent = data?.error || 'Invalid code';
+    result.style.color = 'var(--red)'; result.textContent = data?.error || 'Invalid code';
   } else {
-    result.style.color = 'var(--green)';
-    result.textContent = `✓ ${data.message} — ${data.tier.toUpperCase()} tier unlocked`;
-    await loadProfile();
-    showToast('Access unlocked 🎉');
+    result.style.color = 'var(--green)'; result.textContent = `✓ ${data.tier.toUpperCase()} tier unlocked`;
+    await loadProfile(); showToast('Access unlocked 🎉');
   }
 }
 
 // ── NAV ───────────────────────────────────────────────────────
 function switchTab(tab) {
-  ['today', 'coach', 'profile'].forEach(t => {
+  ['today','coach','profile'].forEach(t => {
     document.getElementById(`tab-${t}`).style.display = t === tab ? 'flex' : 'none';
     document.getElementById(`nav-${t}`).classList.toggle('active', t === tab);
   });
@@ -887,16 +1046,14 @@ function switchTab(tab) {
     setTimeout(() => {
       const sched = getUserDaySchedule(new Date().getDay());
       const name = currentProfile?.full_name?.split(' ')[0] || 'there';
-      addMessage('assistant', `Hey ${name}! Today is ${sched.label} day ${sched.icon}\n\nI'm your AI coach. Ask me anything — what to do today, how to optimize your recovery, nutrition timing, or just talk through your training. What's on your mind?`);
+      addMessage('assistant', `Hey ${name}! Today is ${sched.label} day ${sched.icon}\n\nI'm your coach — and I already have your intake context. What's on your mind?`);
     }, 300);
   }
 }
 
-// ── TOAST ─────────────────────────────────────────────────────
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
+  t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 </script>

@@ -88,8 +88,8 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .ob-day-editing { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
 
 /* ── INTAKE CONVERSATION (ACT 2) ── */
-#intake-screen { background: var(--bg); display: none; flex-direction: column; height: 100%; }
-#intake-screen.active { display: flex; }
+#intake-screen { background: var(--bg); }
+
 .intake-header { padding: calc(var(--safe-top) + 16px) 20px 12px; border-bottom: 1px solid var(--border); }
 .intake-title { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--gold); letter-spacing: 2px; font-weight: 500; }
 .intake-sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
@@ -116,8 +116,8 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 @keyframes tdot { 0%,60%,100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
 
 /* ── FILE UPLOAD (ACT 3) ── */
-#upload-screen { background: var(--bg); display: none; flex-direction: column; height: 100%; }
-#upload-screen.active { display: flex; }
+#upload-screen { background: var(--bg); }
+
 .upload-content { flex: 1; overflow-y: auto; padding: calc(var(--safe-top) + 24px) 24px calc(var(--safe-bottom) + 24px); -webkit-overflow-scrolling: touch; }
 .upload-content::-webkit-scrollbar { display: none; }
 .upload-zone { border: 2px dashed var(--border); border-radius: 16px; padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.2s; margin-bottom: 16px; }
@@ -297,7 +297,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 </div>
 
 <!-- ── INTAKE: ACT 2 — AI CONVERSATION ── -->
-<div id="intake-screen">
+<div id="intake-screen" class="screen">
   <div class="intake-header">
     <div class="intake-title">YOUR STORY</div>
     <div class="intake-sub">Conversation with your AI coach · Private & confidential</div>
@@ -314,7 +314,7 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 </div>
 
 <!-- ── UPLOAD: ACT 3 — HEALTH DATA ── -->
-<div id="upload-screen">
+<div id="upload-screen" class="screen">
   <div class="upload-content">
     <div style="padding-top: calc(var(--safe-top))">
       <div style="margin-bottom:28px">

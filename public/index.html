@@ -639,6 +639,14 @@ function obInit() {
     </div>`).join('');
 
   obGoTo(0);
+
+  // Update continue button text based on tier
+  getEffectiveTier().then(tier => {
+    if (tier === 'free') {
+      const btns = document.querySelectorAll('#ob-step-1 .ob-next');
+      if (btns.length) btns[btns.length - 1].textContent = 'Start Training →';
+    }
+  });
 }
 
 function obGoTo(step) {
@@ -679,7 +687,7 @@ async function obFinishLogistics() {
   const finalSchedule = {};
   for (let i = 0; i < 7; i++) finalSchedule[i] = obSchedule[i] || { type: 'rest' };
 
-  // Save logistics to profile (not yet onboarded — intake still pending)
+  // Save logistics to profile
   await sb.from('profiles').update({
     full_name: name,
     equipment: obEquipment.length ? obEquipment : ['bodyweight'],
@@ -688,8 +696,39 @@ async function obFinishLogistics() {
   }).eq('id', currentUser.id);
 
   await loadProfile();
-  // Move to intake conversation
-  startIntake(name);
+
+  // Determine effective tier (check overrides too)
+  const effectiveTier = await getEffectiveTier();
+
+  if (effectiveTier === 'free') {
+    // Free tier: skip intake conversation and upload — go straight to app
+    await sb.from('profiles').update({ onboarded: true }).eq('id', currentUser.id);
+    await loadProfile();
+    showScreen('main-screen');
+    initToday();
+    loadTodayMetrics();
+    showToast(`Welcome, ${name}! 🔥`);
+  } else {
+    // Paid tiers: full intake conversation flow
+    startIntake(name);
+  }
+}
+
+// Helper: resolve effective tier including overrides
+async function getEffectiveTier() {
+  let tier = (currentProfile?.subscription_tier || 'free').toLowerCase();
+  try {
+    const orRes = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_access_override', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_user_id: currentUser.id, p_email: currentUser.email })
+    });
+    const orData = await orRes.json();
+    if (Array.isArray(orData) && orData.length) {
+      tier = orData[0].tier.toLowerCase();
+    }
+  } catch(e) { console.warn('Override check in onboarding:', e); }
+  return tier;
 }
 
 // ── INTAKE CONVERSATION ───────────────────────────────────────

@@ -559,13 +559,12 @@ function showScreen(id) {
 }
 
 function routeUser() {
-  if (!currentProfile) { showScreen('auth-screen'); return; }
-  if (!currentProfile.onboarded) {
-    // New user — start logistics
+  if (!currentUser) { showScreen('auth-screen'); return; }
+  // If profile null (e.g. schema migration pending), treat as new user
+  if (!currentProfile || !currentProfile.onboarded) {
     showScreen('onboarding-screen');
     obInit();
   } else {
-    // Returning user — main app
     showScreen('main-screen');
     initToday();
     loadTodayMetrics();

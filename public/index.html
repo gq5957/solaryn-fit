@@ -534,14 +534,24 @@ const TIER_INFO = {
 
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) { currentUser = session.user; await loadProfile(); routeUser(); }
+  try {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      currentUser = session.user;
+      await loadProfile();
+      routeUser();
+    }
+  } catch(e) {
+    console.error('Init error:', e);
+  }
 });
 
 sb.auth.onAuthStateChange(async (event, session) => {
+  console.log('Auth event:', event, 'session:', !!session);
   if (event === 'SIGNED_IN' && session) {
     currentUser = session.user;
-    await loadProfile();
+    try { await loadProfile(); } catch(e) { console.error('loadProfile error:', e); }
+    console.log('currentProfile after load:', currentProfile);
     routeUser();
   } else if (event === 'SIGNED_OUT') {
     currentUser = null; currentProfile = null;
@@ -839,8 +849,15 @@ function openUploadFlow() {
 // ── PROFILE ───────────────────────────────────────────────────
 async function loadProfile() {
   if (!currentUser) return;
-  const { data } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-  currentProfile = data;
+  try {
+    const { data, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
+    console.log('Profile query result:', data, 'error:', error);
+    if (error) console.error('Profile error:', error.message);
+    currentProfile = data;
+  } catch(e) {
+    console.error('Profile fetch exception:', e);
+    currentProfile = null;
+  }
 
   let overrideActive = false, overrideTier = null;
   let effectiveTier = data?.subscription_tier?.toLowerCase() || 'free';

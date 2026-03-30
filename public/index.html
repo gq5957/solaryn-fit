@@ -850,52 +850,82 @@ function openUploadFlow() {
 async function loadProfile() {
   if (!currentUser) return;
   try {
-    const { data, error } = await sb.from('profiles').select('*').eq('id', currentUser.id).single();
-    console.log('Profile query result:', data, 'error:', error);
-    if (error) console.error('Profile error:', error.message);
-    currentProfile = data;
+    // Use raw fetch + localStorage token to bypass Supabase client lock bug
+    var storageKey = Object.keys(localStorage).find(function(k) {
+      return k.includes('auth-token') || k.includes('supabase.auth');
+    });
+    var stored = storageKey ? JSON.parse(localStorage.getItem(storageKey)) : null;
+    var token = (stored && (stored.access_token || (stored.session && stored.session.access_token))) || null;
+
+    // Fallback: try getSession with timeout
+    if (!token) {
+      try {
+        var sr = await Promise.race([
+          sb.auth.getSession(),
+          new Promise(function(_, rej) { setTimeout(function() { rej(new Error('timeout')); }, 3000); })
+        ]);
+        token = sr && sr.data && sr.data.session ? sr.data.session.access_token : null;
+      } catch(e) { console.warn('getSession fallback failed:', e.message); }
+    }
+
+    var headers = { 'apikey': SUPABASE_ANON };
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    var res = await fetch(SUPABASE_URL + '/rest/v1/profiles?select=*&id=eq.' + currentUser.id, { headers });
+    var rows = await res.json();
+    currentProfile = Array.isArray(rows) ? (rows[0] || null) : null;
   } catch(e) {
-    console.error('Profile fetch exception:', e);
+    console.error('loadProfile error:', e);
     currentProfile = null;
   }
 
-  let overrideActive = false, overrideTier = null;
-  let effectiveTier = data?.subscription_tier?.toLowerCase() || 'free';
+  if (!currentProfile) return;
 
-  const { data: override } = await sb.rpc('get_access_override', {
-    p_user_id: currentUser.id, p_email: currentUser.email
-  });
-  if (override?.length) {
-    overrideActive = true;
-    overrideTier = override[0].tier;
-    effectiveTier = override[0].tier.toLowerCase();
-  }
+  var data = currentProfile;
+  var overrideActive = false, overrideTier = null;
+  var effectiveTier = data.subscription_tier ? data.subscription_tier.toLowerCase() : 'free';
 
-  const tierInfo = TIER_INFO[effectiveTier] || TIER_INFO.free;
+  try {
+    var orRes = await fetch(SUPABASE_URL + '/rest/v1/rpc/get_access_override', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_ANON, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ p_user_id: currentUser.id, p_email: currentUser.email })
+    });
+    var orData = await orRes.json();
+    if (Array.isArray(orData) && orData.length) {
+      overrideActive = true;
+      overrideTier = orData[0].tier;
+      effectiveTier = orData[0].tier.toLowerCase();
+    }
+  } catch(e) { console.warn('Override check failed:', e); }
 
-  if (data) {
-    const nameEl = document.getElementById('profile-name');
-    const tierEl = document.getElementById('profile-tier');
-    const coachEl = document.getElementById('coach-tier-label');
-    if (nameEl) nameEl.textContent = data.full_name || data.email?.split('@')[0] || 'Athlete';
-    if (document.getElementById('profile-email')) document.getElementById('profile-email').textContent = data.email || currentUser.email;
-    if (tierEl) tierEl.textContent = tierInfo.label + (overrideActive ? ' ✦' : '') + ' TIER';
-    if (coachEl) coachEl.textContent = (effectiveTier === 'elite' || effectiveTier === 'coached') ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
+  var tierInfo = TIER_INFO[effectiveTier] || TIER_INFO.free;
 
-    // Debug badge
-    const dbTier = document.getElementById('debug-tier');
-    if (dbTier) { dbTier.textContent = tierInfo.label; dbTier.className = `debug-val ${tierInfo.cssClass}`; }
-    const dbModel = document.getElementById('debug-model'); if (dbModel) dbModel.textContent = tierInfo.model;
-    const dbOver = document.getElementById('debug-override'); if (dbOver) dbOver.textContent = overrideActive ? `✓ ${overrideTier}` : '✗ No';
-    const dbIntake = document.getElementById('debug-intake'); if (dbIntake) dbIntake.textContent = data.intake_narrative ? '✓ Yes' : '✗ No';
-    const dbUid = document.getElementById('debug-uid'); if (dbUid) dbUid.textContent = currentUser.id;
+  var nameEl = document.getElementById('profile-name');
+  var tierEl = document.getElementById('profile-tier');
+  var coachEl = document.getElementById('coach-tier-label');
+  if (nameEl) nameEl.textContent = data.full_name || (data.email ? data.email.split('@')[0] : 'Athlete');
+  var emailEl = document.getElementById('profile-email');
+  if (emailEl) emailEl.textContent = data.email || currentUser.email;
+  if (tierEl) tierEl.textContent = tierInfo.label + (overrideActive ? ' ✦' : '') + ' TIER';
+  if (coachEl) coachEl.textContent = (effectiveTier === 'elite' || effectiveTier === 'coached') ? 'Claude Sonnet · Full Access' : 'Claude Haiku · Unlimited';
 
-    // Health files count
-    const { count } = await sb.from('genomic_insights').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
-    const dbFiles = document.getElementById('debug-files'); if (dbFiles) dbFiles.textContent = `${count || 0} file(s)`;
-    const hfc = document.getElementById('health-files-count'); if (hfc) hfc.textContent = count ? `${count} uploaded` : '→';
-  }
+  var dbTier = document.getElementById('debug-tier');
+  if (dbTier) { dbTier.textContent = tierInfo.label; dbTier.className = 'debug-val ' + tierInfo.cssClass; }
+  var dbModel = document.getElementById('debug-model'); if (dbModel) dbModel.textContent = tierInfo.model;
+  var dbOver = document.getElementById('debug-override'); if (dbOver) dbOver.textContent = overrideActive ? ('✓ ' + overrideTier) : '✗ No';
+  var dbIntake = document.getElementById('debug-intake'); if (dbIntake) dbIntake.textContent = data.intake_narrative ? '✓ Yes' : '✗ No';
+  var dbUid = document.getElementById('debug-uid'); if (dbUid) dbUid.textContent = currentUser.id;
+
+  try {
+    var cRes = await fetch(SUPABASE_URL + '/rest/v1/genomic_insights?select=id&user_id=eq.' + currentUser.id, {
+      headers: { 'apikey': SUPABASE_ANON, 'Prefer': 'count=exact' }
+    });
+    var count = parseInt(cRes.headers.get('content-range')?.split('/')[1] || '0');
+    var dbFiles = document.getElementById('debug-files'); if (dbFiles) dbFiles.textContent = count + ' file(s)';
+    var hfc = document.getElementById('health-files-count'); if (hfc) hfc.textContent = count ? (count + ' uploaded') : '→';
+  } catch(e) {}
 }
+
 
 // ── TODAY ─────────────────────────────────────────────────────
 function initToday() {

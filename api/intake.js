@@ -1,9 +1,7 @@
-// api/intake.js — AI-driven intake conversation + file processing
-const { createClient } = require('@supabase/supabase-js');
-const Anthropic = require('@anthropic-ai/sdk');
+// api/intake.js — AI intake conversation + health file processing
+// CommonJS, uses raw fetch (no @anthropic-ai/sdk needed)
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+const { createClient } = require('@supabase/supabase-js');
 
 const INTAKE_SYSTEM_PROMPT = `You are conducting a health intake conversation for Solaryn Fit, an AI health coaching platform. Your job is to deeply understand this person — not just their logistics, but their story.
 
@@ -12,12 +10,12 @@ You believe in the Iceberg Theory: the visible symptoms (weight gain, low energy
 CONVERSATION APPROACH:
 - Ask one focused question at a time. Never stack multiple questions.
 - Listen for what's underneath the surface answer. If someone says "I just can't stay consistent," that's not the real answer — dig into why.
-- Be warm, direct, and non-judgmental. This isn't a therapy session but it should feel safe enough to be honest.
+- Be warm, direct, and non-judgmental. This should feel safe enough to be honest.
 - Pay attention to what they DON'T say. Avoidance is data.
 - When alcohol, stress, or emotional patterns come up, don't skip past them. These are often the actual iceberg.
 
 TOPICS TO COVER (weave naturally, don't checklist):
-1. What specifically isn't working right now — and how long has it been this way
+1. What specifically isn't working right now — and how long it's been this way
 2. What they've tried before — and the honest reason it didn't stick
 3. Their daily life: sleep quality, stress load, work demands, travel, alcohol habits
 4. Their relationship with their own body and fitness — any shame, frustration, or emotional charge
@@ -26,21 +24,21 @@ TOPICS TO COVER (weave naturally, don't checklist):
 CONVERSATION PHASES:
 - Opening: Start with "Tell me what's not working." Let them go first.
 - Middle: Follow their lead, dig one level deeper on each answer
-- Closing: When you feel you have a full picture (usually 6-10 exchanges), summarize what you've heard and ask if it feels accurate. Then say you're going to save this as their coaching baseline.
+- Closing: When you have a full picture (usually 6-10 exchanges), summarize what you have heard and ask if it feels accurate. Then say you are saving this as their coaching baseline.
 
 ENDING THE CONVERSATION:
 When ready to close, output EXACTLY this JSON on its own line (no markdown, no backticks):
-{"intake_complete": true, "summary": "...comprehensive narrative summary of everything learned..."}
+{"intake_complete": true, "summary": "...comprehensive narrative summary..."}
 
-The summary should be 200-400 words, written in third person, structured as:
-- What they're dealing with right now
-- Their history and what they've tried  
+The summary should be 200-400 words, third person, covering:
+- What they are dealing with right now
+- History and what they have tried
 - Key lifestyle factors (sleep, stress, alcohol, work)
-- Their emotional relationship with fitness
+- Emotional relationship with fitness
 - What success looks like for them
-- Key patterns or iceberg factors you identified
+- Key iceberg patterns you identified
 
-IMPORTANT: Only output the JSON when you genuinely have enough to build a useful coaching baseline. Don't rush it.`;
+Only output the JSON when you genuinely have enough to build a useful coaching baseline.`;
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -49,73 +47,61 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { action, messages, user_id, file_data, file_type, file_name } = req.body;
+  const { action, messages, user_id, file_data, file_type, file_name } = req.body || {};
 
-  // ── ACTION: process uploaded file ──────────────────────────
+  const supabase = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY)
+    ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
+    : null;
+
+  // ── ACTION: process uploaded health file ───────────────────
   if (action === 'process_file') {
     if (!user_id || !file_data) return res.status(400).json({ error: 'Missing user_id or file_data' });
 
     try {
-      let prompt = '';
-      let contentBlocks = [];
+      let userContent;
 
-      if (file_type === 'application/pdf' || file_type?.includes('pdf')) {
-        // PDF: send as document
-        contentBlocks = [
+      if (file_type === 'application/pdf' || (file_type && file_type.includes('pdf'))) {
+        userContent = [
           {
             type: 'document',
             source: { type: 'base64', media_type: 'application/pdf', data: file_data }
           },
           {
             type: 'text',
-            text: `This is a health document uploaded by a user (filename: ${file_name}). 
-            
-Please analyze it and extract a structured health summary including:
-- Document type (blood panel, genetic report, hormone panel, metabolic panel, etc.)
-- Key biomarkers and their values/status (normal/low/high)
-- Any flagged abnormalities or items of note
-- Relevant fitness and recovery implications based on the data
-- Genetic variants if present (e.g. ACTN3, PPARGC1A, APOE, MTHFR, etc.) and their fitness/health implications
-- Recommendations or patterns the AI coach should be aware of
-
-Format as a clear, structured summary that can be used as ongoing coaching context. Be specific with numbers and values where present.`
+            text: 'This is a health document uploaded by a user (filename: ' + file_name + ').\n\nPlease analyze it and extract a structured health summary including:\n- Document type (blood panel, genetic report, hormone panel, metabolic panel, etc.)\n- Key biomarkers and their values/status (normal/low/high)\n- Any flagged abnormalities or items of note\n- Relevant fitness and recovery implications\n- Genetic variants if present (ACTN3, PPARGC1A, APOE, MTHFR, etc.) and their fitness/health implications\n- Recommendations the AI coach should be aware of\n\nFormat as a clear, structured summary for ongoing coaching context.'
           }
         ];
       } else {
-        // Text-based (genetic raw data, CSV exports, etc.)
         const decoded = Buffer.from(file_data, 'base64').toString('utf-8');
-        const preview = decoded.substring(0, 8000); // limit context
-        contentBlocks = [
-          {
-            type: 'text',
-            text: `This is health data uploaded by a user (filename: ${file_name}):
-
-${preview}
-
-Please analyze this data and extract a structured health summary including:
-- Data type and source (23andMe, AncestryDNA, Oura export, Garmin, etc.)
-- Key health-relevant genetic variants if present (ACTN3, PPARGC1A, APOE, MTHFR, BDNF, etc.) and their implications
-- Any fitness, recovery, or nutrition relevant patterns
-- Biomarkers or metrics if present
-- What the AI coach should know about this person based on this data
-
-Format as a clear, structured summary for coaching use.`
-          }
-        ];
+        const preview = decoded.substring(0, 8000);
+        userContent = 'This is health data uploaded by a user (filename: ' + file_name + '):\n\n' + preview + '\n\nPlease analyze this data and extract a structured health summary including:\n- Data type and source (23andMe, AncestryDNA, Oura, Garmin, etc.)\n- Key health-relevant genetic variants if present and their implications\n- Any fitness, recovery, or nutrition relevant patterns\n- Biomarkers or metrics if present\n- What the AI coach should know about this person based on this data\n\nFormat as a clear, structured summary for coaching use.';
       }
 
-      const response = await anthropic.messages.create({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        messages: [{ role: 'user', content: contentBlocks }]
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1500,
+          messages: [{ role: 'user', content: userContent }],
+        }),
       });
 
-      const summary = response.content[0].text;
+      if (!response.ok) {
+        const errText = await response.text();
+        console.error('Claude file processing error:', response.status, errText);
+        return res.status(500).json({ error: 'File processing failed' });
+      }
 
-      // Store summary in genomic_insights
-      const { error: dbError } = await supabase
-        .from('genomic_insights')
-        .upsert({
+      const data = await response.json();
+      const summary = (data.content && data.content[0] && data.content[0].text) || 'Could not process file.';
+
+      if (supabase) {
+        await supabase.from('genomic_insights').upsert({
           user_id,
           file_name,
           file_type,
@@ -123,8 +109,7 @@ Format as a clear, structured summary for coaching use.`
           processed_at: new Date().toISOString(),
           raw_available: true
         }, { onConflict: 'user_id,file_name' });
-
-      if (dbError) console.error('DB error storing file summary:', dbError);
+      }
 
       return res.status(200).json({ success: true, summary });
 
@@ -135,36 +120,49 @@ Format as a clear, structured summary for coaching use.`
   }
 
   // ── ACTION: intake conversation turn ───────────────────────
-  if (!user_id || !messages) return res.status(400).json({ error: 'Missing user_id or messages' });
+  if (!messages || !Array.isArray(messages)) {
+    return res.status(400).json({ error: 'Missing messages' });
+  }
 
   try {
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 800,
-      system: INTAKE_SYSTEM_PROMPT,
-      messages
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 800,
+        system: INTAKE_SYSTEM_PROMPT,
+        messages: messages.map(function(m) { return { role: m.role, content: m.content }; }),
+      }),
     });
 
-    const reply = response.content[0].text;
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error('Claude intake error:', response.status, errText);
+      return res.status(500).json({ error: 'AI service error' });
+    }
+
+    const data = await response.json();
+    const reply = (data.content && data.content[0] && data.content[0].text) || 'Something went wrong.';
 
     // Check if intake is complete
     const jsonMatch = reply.match(/\{"intake_complete":\s*true[\s\S]*?\}/);
     if (jsonMatch) {
       try {
         const parsed = JSON.parse(jsonMatch[0]);
-        if (parsed.intake_complete && parsed.summary) {
-          // Save narrative to profiles
-          await supabase
-            .from('profiles')
-            .update({
-              intake_narrative: parsed.summary,
-              intake_completed_at: new Date().toISOString(),
-              onboarded: true
-            })
-            .eq('id', user_id);
+        if (parsed.intake_complete && parsed.summary && supabase && user_id) {
+          await supabase.from('profiles').update({
+            intake_narrative: parsed.summary,
+            intake_completed_at: new Date().toISOString(),
+            onboarded: true
+          }).eq('id', user_id);
 
           return res.status(200).json({
-            reply: "I've got a clear picture of where you are and what you're working with. I've saved this as your coaching baseline — every conversation we have from here will build on this context.\n\nLet's get you set up with the rest of your profile, then you can head into the app.",
+            reply: "I've got a clear picture of where you are and what you're working with. I've saved this as your coaching baseline — every conversation we have from here will build on this context.\n\nLet's get you into the app.",
             intake_complete: true,
             summary: parsed.summary
           });

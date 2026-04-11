@@ -75,9 +75,10 @@ module.exports = async function handler(req, res) {
     }
 
     // ── SELECT MODEL ───────────────────────────────────────────
-    const model = (effectiveTier === 'elite' || effectiveTier === 'coached')
-      ? 'claude-sonnet-4-6'
-      : 'claude-haiku-4-5-20251001';
+    const model =
+      effectiveTier === 'elite'   ? 'claude-opus-4-6' :
+      effectiveTier === 'coached' ? 'claude-sonnet-4-6' :
+      'claude-haiku-4-5-20251001';
 
     // ── CALL CLAUDE ────────────────────────────────────────────
     const response = await fetch('https://api.anthropic.com/v1/messages', {

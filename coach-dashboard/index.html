@@ -256,11 +256,17 @@ function showDashboard() {
 // ── DATA ───────────────────────────────────────────────────────
 async function loadClients() {
   const { data: { user } } = await sb.auth.getUser();
-  const { data } = await sb.from('profiles')
-    .select('*, body_stats(*), workout_logs(*), messages(*)')
+  const { data, error } = await sb.from('profiles')
+    .select('*')
     .eq('coach_id', user.id)
     .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('loadClients error:', error);
+    return;
+  }
   clients = data || [];
+  console.log('Clients loaded:', clients.length);
   renderCurrentView();
 }
 

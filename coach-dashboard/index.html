@@ -381,7 +381,7 @@ function renderClientsView() {
                     </div>
                   </div>
                 </td>
-                <td><span class="tier-badge tier-${tier}">${tier.toUpperCase()}</span></td>
+                <td><span class="tier-badge tier-${tier}">${tier.toUpperCase()}</span>${tier === 'free' ? ' <span title="Locked — free tier" style="margin-left:4px">🔒</span>' : ''}</td>
                 <td style="color:var(--muted);font-size:13px">${lastActive || '—'}</td>
                 <td>
                   <div class="hrv-bar">
@@ -423,7 +423,11 @@ function renderRevenueView() {
     <div class="revenue-grid">
       <div class="revenue-card">
         <div class="section-title" style="margin-bottom:16px">REVENUE BY TIER</div>
-        ${Object.entries({ elite: [C='var(--purple)',599], coached: [C='var(--gold)',299], app: [C='var(--blue)',19] }).map(([tier, [color, price]]) => {
+        ${[
+          ['elite',   'var(--purple)', 599],
+          ['coached', 'var(--gold)',   299],
+          ['app',     'var(--blue)',    19],
+        ].map(([tier, color, price]) => {
           const count = tierCounts[tier];
           const rev = count * price;
           const pct = mrr ? Math.round(rev / mrr * 100) : 0;
@@ -441,9 +445,10 @@ function renderRevenueView() {
       <div class="revenue-card">
         <div class="section-title" style="margin-bottom:16px">GROWTH LEVERS</div>
         <div style="font-size:13px;color:var(--muted);line-height:1.8">
-          <p>💡 <strong style="color:var(--white)">${tierCounts.free} free users</strong> — conversion target</p>
-          <p>🎯 <strong style="color:var(--white)">App → Coached</strong> = +$280/mo each</p>
-          <p>🚀 <strong style="color:var(--white)">Coached → Elite</strong> = +$300/mo each</p>
+          <p>🆓 <strong style="color:var(--white)">${tierCounts.free} free users</strong> — conversion target</p>
+          <p>📱 <strong style="color:var(--white)">Free → App</strong> = +$19/mo each (unlimited Haiku AI)</p>
+          <p>🎯 <strong style="color:var(--white)">App → Coached</strong> = +$280/mo each (Sonnet AI + 1:1)</p>
+          <p>🚀 <strong style="color:var(--white)">Coached → Elite</strong> = +$300/mo each (Opus AI + weekly calls)</p>
           <p>🏢 <strong style="color:var(--white)">1 white-label client</strong> = +$997/mo</p>
           <hr style="border-color:var(--border);margin:12px 0">
           <p>Next $10K MRR: ${Math.ceil((10000 - mrr) / 299)} coached clients or ${Math.ceil((10000 - mrr) / 997)} WL deals</p>

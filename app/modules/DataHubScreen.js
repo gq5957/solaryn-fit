@@ -20,6 +20,7 @@ import {
 import {
   isHealthKitAvailable, requestHealthKitPermissions, fetchTodayMetrics
 } from './healthkit';
+import { hasAccess } from '../App';
 
 const C = {
   bg: '#0A0A0F', surface: '#111118', card: '#16161F', border: '#1E1E2A',
@@ -43,6 +44,10 @@ export default function DataHubScreen({ supabase, profile }) {
   }, []);
 
   const checkHealthKit = async () => {
+    if (!hasAccess(profile?.subscription_tier, 'healthkit')) {
+      setHealthKitAvailable(false);
+      return;
+    }
     const available = await isHealthKitAvailable();
     setHealthKitAvailable(available);
   };
@@ -62,6 +67,13 @@ export default function DataHubScreen({ supabase, profile }) {
 
   // ── CONNECT APPLE HEALTH ───────────────────────────────────
   const connectAppleHealth = async () => {
+    if (!hasAccess(profile?.subscription_tier, 'healthkit')) {
+      Alert.alert(
+        'Upgrade required',
+        'Apple Health sync is available on the App plan and above. Upgrade from Account → Subscription to unlock live HealthKit data.'
+      );
+      return;
+    }
     setProcessing('apple_health');
     const result = await requestHealthKitPermissions();
     if (result.granted) {
@@ -76,6 +88,13 @@ export default function DataHubScreen({ supabase, profile }) {
 
   // ── UPLOAD FILE ────────────────────────────────────────────
   const handleUpload = async (source) => {
+    if (!hasAccess(profile?.subscription_tier, 'uploads')) {
+      Alert.alert(
+        'Upgrade required',
+        'Uploading genomic, wearable, and medical data is available on Coached and Elite plans. Upgrade from Account → Subscription to unlock full data integration.'
+      );
+      return;
+    }
     setProcessing(source.id);
     try {
       const result = await DocumentPicker.getDocumentAsync({

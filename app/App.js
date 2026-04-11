@@ -66,6 +66,13 @@ const TIERS = [
   },
 ];
 
+// ── TIER FEATURE GATING ───────────────────────────────────────
+export function hasAccess(tier, feature) {
+  const levels = { free: 0, app: 1, coached: 2, elite: 3 };
+  const required = { healthkit: 1, uploads: 2, messaging: 2 };
+  return (levels[tier] || 0) >= (required[feature] || 0);
+}
+
 // ── AUTH CONTEXT ───────────────────────────────────────────────
 const AuthContext = createContext(null);
 const useAuth = () => useContext(AuthContext);

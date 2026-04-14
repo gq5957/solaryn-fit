@@ -47,7 +47,9 @@ module.exports = async (req, res) => {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { action, messages, user_id, file_data, file_type, file_name } = req.body || {};
+  const { action, messages, user_id, file_data, file_type, file_name, language } = req.body || {};
+  const lang = language || 'en';
+  const isSpanish = lang === 'es';
 
   const supabase = (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY)
     ? createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY)
@@ -135,7 +137,9 @@ module.exports = async (req, res) => {
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 800,
-        system: INTAKE_SYSTEM_PROMPT,
+        system: isSpanish
+          ? INTAKE_SYSTEM_PROMPT + '\n\nIDIOMA CRÍTICO: Responde SIEMPRE en español latinoamericano. Usa tú (informal). Sé cálido, directo y conversacional. Mantén la terminología de fitness precisa pero accesible.'
+          : INTAKE_SYSTEM_PROMPT,
         messages: messages.map(function(m) { return { role: m.role, content: m.content }; }),
       }),
     });
@@ -161,8 +165,11 @@ module.exports = async (req, res) => {
             onboarded: true
           }).eq('id', user_id);
 
+          const completionMsg = isSpanish
+              ? "Ya tengo una imagen clara de dónde estás y con qué estás trabajando. Guardé esto como tu base de coaching — cada conversación que tengamos a partir de aquí se construirá sobre este contexto.\n\n¡Entremos a la app."
+              : "I've got a clear picture of where you are and what you're working with. I've saved this as your coaching baseline — every conversation we have from here will build on this context.\n\nLet's get you into the app.";
           return res.status(200).json({
-            reply: "I've got a clear picture of where you are and what you're working with. I've saved this as your coaching baseline — every conversation we have from here will build on this context.\n\nLet's get you into the app.",
+            reply: completionMsg,
             intake_complete: true,
             summary: parsed.summary
           });

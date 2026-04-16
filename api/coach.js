@@ -123,6 +123,7 @@ Keep responses under 200 words unless asked for a full program.`;
 function buildSystemPrompt(ctx, tier) {
   const p = ctx.profile || {};
   const h = ctx.today_health;
+  const today = ctx.today || {};
   const genomic = ctx.genomic_insights;
   const lang = p.language === 'es' ? 'Respond in Spanish.' : 'Respond in English.';
 
@@ -132,7 +133,24 @@ function buildSystemPrompt(ctx, tier) {
         .join(', ')
     : 'not set';
 
+  // Today's scheduled workout type (so the AI anchors on the right day)
+  let todayType = 'unknown';
+  if (today.weekday && p.schedule) {
+    const dayIdx = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(today.weekday);
+    if (dayIdx >= 0 && p.schedule[dayIdx]) {
+      todayType = typeof p.schedule[dayIdx] === 'object' ? p.schedule[dayIdx].type : p.schedule[dayIdx];
+    }
+  }
+
   let prompt = `You are ${p.name || 'this user'}'s personal AI fitness coach inside Solaryn Fit.
+
+TODAY:
+- Date: ${today.date || 'unknown'}
+- Day of week: ${today.weekday || 'unknown'}
+- Timezone: ${today.timezone || 'unknown'}
+- Scheduled training type: ${todayType}
+
+IMPORTANT: Use "today" to mean ${today.weekday || 'the current day'}. Do not guess the weekday from context — the date above is authoritative.
 
 PROFILE:
 - Age: ${p.age ? Math.round(p.age) : 'unknown'}

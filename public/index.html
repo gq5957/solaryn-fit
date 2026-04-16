@@ -622,9 +622,18 @@ function routeUser() {
 let isSignUp = false;
 function toggleAuthMode() {
   isSignUp = !isSignUp;
+  renderAuthToggle();
+}
+
+// Rebuild the auth-toggle text with data-i18n attrs so language switches update it
+function renderAuthToggle() {
   const toggle = document.getElementById('auth-toggle-text');
-  if (isSignUp) toggle.innerHTML = `<span>${t('auth.haveAccount')}</span> <span style="color:var(--gold)">${t('auth.signInLink')}</span>`;
-  else toggle.innerHTML = `<span>${t('auth.newHere')}</span> <span style="color:var(--gold)">${t('auth.createLink')}</span>`;
+  if (!toggle) return;
+  if (isSignUp) {
+    toggle.innerHTML = `<span data-i18n="auth.haveAccount">${t('auth.haveAccount')}</span> <span data-i18n="auth.signInLink" style="color:var(--gold)">${t('auth.signInLink')}</span>`;
+  } else {
+    toggle.innerHTML = `<span data-i18n="auth.newHere">${t('auth.newHere')}</span> <span data-i18n="auth.createLink" style="color:var(--gold)">${t('auth.createLink')}</span>`;
+  }
 }
 async function signIn() {
   const email = document.getElementById('auth-email').value.trim();
@@ -642,13 +651,31 @@ async function signUp() {
   errEl.textContent = '';
   if (!email || !pass) { errEl.textContent = t('auth.errorEmpty'); return; }
   if (pass.length < 6) { errEl.textContent = t('auth.errorShortPass'); return; }
-  const { error } = await sb.auth.signUp({ email, password: pass });
+  const { error } = await sb.auth.signUp({
+    email,
+    password: pass,
+    options: { data: { language: appLang } }  // read by handle_new_user() trigger
+  });
   if (error) { errEl.textContent = error.message; return; }
   showToast(t('auth.createdToast'));
   const { error: e2 } = await sb.auth.signInWithPassword({ email, password: pass });
-  if (e2) errEl.textContent = e2.message;
+  if (e2) { errEl.textContent = e2.message; return; }
+  // Belt-and-suspenders: ensure profile.language matches the auth screen choice
+  // even if the trigger didn't pick up raw_user_meta_data.language
+  try {
+    const { data: { user } } = await sb.auth.getUser();
+    if (user) await sb.from('profiles').update({ language: appLang }).eq('id', user.id);
+  } catch(e) { console.warn('language sync failed:', e); }
 }
-async function signOut() { await sb.auth.signOut(); }
+async function signOut() {
+  // Preserve language preference; clear everything else to avoid state leaks across sessions
+  const keepLang = localStorage.getItem('solaryn_lang');
+  try { await sb.auth.signOut(); } catch(e) { console.warn('signOut error:', e); }
+  try { localStorage.clear(); } catch(e) {}
+  if (keepLang) localStorage.setItem('solaryn_lang', keepLang);
+  // Hard reload to reset all in-memory state (obSchedule, obEquipment, chatHistory, etc.)
+  location.reload();
+}
 
 // ── ONBOARDING ────────────────────────────────────────────────
 const OB_TYPES = ['rest','strength','cardio','hiit','sport','pilates','yoga','run','recovery'];
@@ -1058,7 +1085,12 @@ function switchTab(tab) {
       const sched = getUserDaySchedule(new Date().getDay());
       const name = currentProfile?.full_name?.split(' ')[0] || 'there';
       const greetFn = t('coach.greeting');
-      const msg = typeof greetFn === 'function' ? greetFn(name, sched.label, sched.icon) : `Hey ${name}! Today is ${sched.label} day ${sched.icon}\n\nWhat's on your mind?`;
+      // Translate the workout type label through the i18n workoutTypes dict so
+      // Spanish users see "descanso" instead of "Rest Day"
+      const typeKey = Object.keys(WORKOUT_TYPES).find(k => WORKOUT_TYPES[k] === sched) || 'rest';
+      const typeLabels = t('onboarding.workoutTypes') || {};
+      const localizedLabel = typeLabels[typeKey] || sched.label;
+      const msg = typeof greetFn === 'function' ? greetFn(name, localizedLabel, sched.icon) : `Hey ${name}! Today is ${localizedLabel} day ${sched.icon}\n\nWhat's on your mind?`;
       addMessage('assistant', msg);
     }, 300);
   }
